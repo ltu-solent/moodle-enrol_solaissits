@@ -163,7 +163,6 @@ class enrol_solaissits_external extends external_api {
                     if ($groupid) {
                         $group->id = $groupid;
                     }
-                    error_log(print_r($group, true));
                 } else if (count($existinggroups) === 1) {
                     $group = reset($existinggroups);
                 } else {

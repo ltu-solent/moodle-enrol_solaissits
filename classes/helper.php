@@ -38,8 +38,6 @@ class helper {
 
     public static function get_user_by_idnumber($idnumber) {
         global $DB;
-        $record = $DB->get_record('user', ['idnumber' => $idnumber]);
-        error_log(print_r($record, true));
-        return $record;
+        return $DB->get_record('user', ['idnumber' => $idnumber]);
     }
 }

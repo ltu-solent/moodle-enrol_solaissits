@@ -26,7 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/group/lib.php');
+require_once($CFG->dirroot . '/lib/externallib.php');
 
+/**
+ * Externallib class for SOL AIS-SITS
+ */
 class enrol_solaissits_external extends external_api {
     /**
      * Returns description of method parameters.
@@ -43,13 +47,15 @@ class enrol_solaissits_external extends external_api {
                         'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'The course to enrol the user role in'),
                         'groups' => new external_multiple_structure(
                             new external_single_structure([
-                                'name' => new external_value(PARAM_ALPHANUMEXT, 'Group name. Group is created if it doesn\'t exist'),
+                                'name' => new external_value(PARAM_ALPHANUMEXT,
+                                    'Group name. Group is created if it doesn\'t exist'),
                                 'action' => new external_value(PARAM_ALPHA, 'add or del', VALUE_OPTIONAL, 'add')
                             ]), 'Manage this user\'s group membership', VALUE_OPTIONAL
                         ),
                         'timestart' => new external_value(PARAM_INT, 'Timestamp when the enrolment start', VALUE_OPTIONAL),
                         'timeend' => new external_value(PARAM_INT, 'Timestamp when the enrolment end', VALUE_OPTIONAL),
-                        'suspend' => new external_value(PARAM_INT, 'set to 1 to suspend & 0 to unsuspend the enrolment', VALUE_OPTIONAL)
+                        'suspend' => new external_value(
+                            PARAM_INT, 'set to 1 to suspend & 0 to unsuspend the enrolment', VALUE_OPTIONAL)
                     ])
                 )
             )
@@ -59,7 +65,7 @@ class enrol_solaissits_external extends external_api {
     /**
      * Enrolment of users.
      *
-     * Function throw an exception at the first error encountered.
+     * Function throws an exception at the first error encountered.
      * @param array $enrolments  An array of user enrolment
      */
     public static function enrol_users($enrolments) {
@@ -109,7 +115,7 @@ class enrol_solaissits_external extends external_api {
             if (!$user) {
                 throw new moodle_exception('userdoesntexist', 'enrol_solaissits');
             }
-            // Check enrolment plugin instance is enabled/exist.
+            // Check enrolment plugin instance is enabled/exists.
             $instance = null;
             $enrolinstances = enrol_get_instances($course->id, true);
             foreach ($enrolinstances as $courseenrolinstance) {
@@ -125,7 +131,7 @@ class enrol_solaissits_external extends external_api {
                 $instance = $instances[$instanceid];
             }
 
-            // Check that the plugin accept enrolment (it should always the case, it's hard coded in the plugin).
+            // Check that the plugin allows this enrolment.
             if (!$enrol->allow_enrol($instance)) {
                 $errorparams = new stdClass();
                 $errorparams->roleid = $enrolment['roleshortname'];
@@ -134,7 +140,7 @@ class enrol_solaissits_external extends external_api {
                 throw new moodle_exception('wscannotenrol', 'enrol_solaissits', '', $errorparams);
             }
 
-            // Finally proceed the enrolment.
+            // Finally proceed with the enrolment.
             $enrolment['timestart'] = isset($enrolment['timestart']) ? $enrolment['timestart'] : 0;
             $enrolment['timeend'] = isset($enrolment['timeend']) ? $enrolment['timeend'] : 0;
             $enrolment['status'] = (isset($enrolment['suspend']) && !empty($enrolment['suspend'])) ?
@@ -147,8 +153,9 @@ class enrol_solaissits_external extends external_api {
             // Add user to groups, if set, or move if group membership has changed.
             // This requires that we are told of membership changes, not just additions.
             // Unenrolements will automatically deal with group membership.
+            $usergroups = $enrolment['groups'] ?? [];
             $coursegroups = groups_get_course_data($course->id);
-            foreach ($enrolment['groups'] as $usergroup) {
+            foreach ($usergroups as $usergroup) {
                 $existinggroups = array_filter($coursegroups->groups, function($coursegroup) use ($usergroup) {
                     return ($usergroup['name'] == $coursegroup->name);
                 });
@@ -167,18 +174,19 @@ class enrol_solaissits_external extends external_api {
                     $group = reset($existinggroups);
                 } else {
                     // This shouldn't happen. Is it possible to have two groups with the same name?
-                    // Yes. Get the first one anyway.
+                    // Not through the UI, but possible programatically. Get the first one anyway.
                     $group = reset($existinggroups);
                 }
+                $action = $usergroup['action'] ?? 'add'; // Default action.
                 // Do the appropriate group membership action.
-                if ($usergroup['action'] == 'add') {
+                if ($action == 'add') {
                     if (!groups_is_member($group->id, $user->id)) {
-                        groups_add_member($group, $user);
+                        groups_add_member($group->id, $user);
                     }
                 }
-                if ($usergroup['action'] == 'del') {
+                if ($action == 'del') {
                     if (groups_is_member($group->id, $user->id)) {
-                        groups_remove_member($group, $user);
+                        groups_remove_member($group->id, $user);
                     }
                 }
             }
@@ -207,7 +215,6 @@ class enrol_solaissits_external extends external_api {
             array(
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
-                        'roleshortname' => new external_value(PARAM_ALPHANUMEXT, 'Role to assign to the user'),
                         'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'The user that is going to be enrolled'),
                         'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'The course to enrol the user role in')
                     ])

@@ -31,7 +31,7 @@ $functions = [
         'methodname'  => 'enrol_users',
         'classpath'   => 'enrol/solaissits/externallib.php',
         'description' => 'Enrol users via the AIS-SITS interface',
-        'capabilities'=> 'enrol/solaissits:enrol',
+        'capabilities' => 'enrol/solaissits:enrol',
         'type'        => 'write',
     ),
     'enrol_solaissits_unenrol_users' => array(
@@ -39,7 +39,7 @@ $functions = [
         'methodname'  => 'unenrol_users',
         'classpath'   => 'enrol/solaissits/externallib.php',
         'description' => 'Unenrol users via the AIS-SITS interface',
-        'capabilities'=> 'enrol/solaissits:unenrol',
+        'capabilities' => 'enrol/solaissits:unenrol',
         'type'        => 'write',
     )
 ];

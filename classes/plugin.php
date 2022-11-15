@@ -23,19 +23,21 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
+/**
+ * SOL AIS-SITS enrolment class
+ */
 class enrol_solaissits_plugin extends enrol_plugin {
     /**
      * Add new instance of enrol plugin.
      * @param stdClass $course
-     * @param array instance fields
-     * @return int id of new instance, null if can not be created
+     * @param array $fields instance fields
+     * @return int|null id of new instance, null if can not be created
      */
     public function add_instance($course, array $fields = null) {
         global $DB;
 
         if ($DB->record_exists('enrol', array('courseid' => $course->id, 'enrol' => 'solaissits'))) {
-            // only one instance allowed, sorry
+            // Only one instance allowed.
             return null;
         }
 
@@ -46,9 +48,8 @@ class enrol_solaissits_plugin extends enrol_plugin {
      * Does this plugin allow enrolments?
      *
      * @param stdClass $instance course enrol instance
-     * All plugins allowing this must implement 'enrol/xxx:enrol' capability
      *
-     * @return bool - true means user with 'enrol/xxx:enrol' may enrol others freely, false means nobody may add more enrolments manually
+     * @return bool - true means user with 'enrol/solaissits:enrol' may enrol others freely.
      */
     public function allow_enrol(stdClass $instance) {
         return true;
@@ -60,7 +61,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
      * @param stdClass $instance course enrol instance
      * All plugins allowing this must implement 'enrol/xxx:unenrol' capability
      *
-     * @return bool - true means user with 'enrol/xxx:unenrol' may unenrol others freely, false means nobody may delete more enrolments manually
+     * @return bool - true means user with 'enrol/solaissits:unenrol' may unenrol others freely.
      */
     public function allow_unenrol(stdClass $instance) {
         return true;

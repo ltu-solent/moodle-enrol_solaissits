@@ -25,19 +25,49 @@
 
 namespace enrol_solaissits;
 
+/**
+ * Helper class
+ */
 class helper {
-    public static function get_course_by_idnumber($idnumber) {
+    /**
+     * Get course record by course idnumber
+     *
+     * @param string $idnumber
+     * @return \stdClass|null
+     */
+    public static function get_course_by_idnumber(string $idnumber) {
         global $DB;
+        if (empty($idnumber)) {
+            return null; // Don't allow empty strings.
+        }
         return $DB->get_record('course', ['idnumber' => $idnumber]);
     }
 
-    public static function get_role_by_shortname($shortname) {
+    /**
+     * Get role by shortname
+     *
+     * @param string $shortname
+     * @return \stdClass|null
+     */
+    public static function get_role_by_shortname(string $shortname) {
         global $DB;
+        if (empty($shortname)) {
+            return null; // Don't allow empty strings.
+        }
         return $DB->get_record('role', ['shortname' => $shortname]);
     }
 
-    public static function get_user_by_idnumber($idnumber) {
+    /**
+     * Get user by idnumber
+     *
+     * @param string $idnumber
+     * @return \stdClass|null
+     */
+    public static function get_user_by_idnumber(string $idnumber) {
         global $DB;
+        if (empty($idnumber)) {
+            return null; // Don't allow empty strings.
+        }
         return $DB->get_record('user', ['idnumber' => $idnumber]);
     }
 }

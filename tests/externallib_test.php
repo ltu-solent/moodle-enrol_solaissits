@@ -51,8 +51,7 @@ class externallib_test extends externallib_advanced_testcase {
         global $DB;
         $this->resetAfterTest();
         // Plugin isn't automatically enabled.
-        $class = \core_plugin_manager::resolve_plugininfo_class('enrol');
-        $class::enable_plugin('solaissits', true);
+        $this->enable_plugin();
 
         $wsuser = $this->getDataGenerator()->create_user();
         $systemcontext = context_system::instance();
@@ -181,8 +180,7 @@ class externallib_test extends externallib_advanced_testcase {
 
         $this->resetAfterTest(true);
         // Plugin isn't automatically enabled.
-        $class = \core_plugin_manager::resolve_plugininfo_class('enrol');
-        $class::enable_plugin('solaissits', true);
+        $this->enable_plugin();
 
         // The user who perform the action.
         $user = $this->getDataGenerator()->create_user();
@@ -207,5 +205,17 @@ class externallib_test extends externallib_advanced_testcase {
             ['useridnumber' => $student->idnumber, 'courseidnumber' => $course->idnumber]
         ]);
         $this->assertFalse(is_enrolled($coursecontext, $student));
+    }
+
+    /**
+     * Enable SOL AIS-SITS plugin
+     *
+     * @return void
+     */
+    protected function enable_plugin() {
+        $enabled = enrol_get_plugins(true);
+        $enabled['solaissits'] = true;
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
     }
 }

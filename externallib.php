@@ -215,8 +215,8 @@ class enrol_solaissits_external extends external_api {
             array(
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
-                        'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'The user that is going to be enrolled'),
-                        'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'The course to enrol the user role in')
+                        'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'The user that is going to be unenrolled'),
+                        'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'The course the user wil be unenrolled from')
                     ])
                 )
             )
@@ -246,6 +246,9 @@ class enrol_solaissits_external extends external_api {
 
         foreach ($params['enrolments'] as $enrolment) {
             $course = enrol_solaissits\helper::get_course_by_idnumber($enrolment['courseidnumber']);
+            if (!$course) {
+                throw new moodle_exception('coursedoesntexist', 'enrol_solaissits');
+            }
             $context = context_course::instance($course->id);
             self::validate_context($context);
             require_capability('enrol/solaissits:unenrol', $context);
@@ -255,7 +258,7 @@ class enrol_solaissits_external extends external_api {
             }
             $user = enrol_solaissits\helper::get_user_by_idnumber($enrolment['useridnumber']);
             if (!$user) {
-                throw new invalid_parameter_exception('User id not exist: ' . $enrolment['useridnumber']);
+                throw new invalid_parameter_exception('User idnumber not exist: ' . $enrolment['useridnumber']);
             }
             if (!$enrol->allow_unenrol($instance)) {
                 throw new moodle_exception('wscannotunenrol', 'enrol_solaissits', '', $enrolment);

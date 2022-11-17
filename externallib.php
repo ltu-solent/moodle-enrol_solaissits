@@ -42,9 +42,9 @@ class enrol_solaissits_external extends external_api {
             array(
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
-                        'roleshortname' => new external_value(PARAM_ALPHANUMEXT, 'Role to assign to the user'),
-                        'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'The user that is going to be enrolled'),
-                        'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'The course to enrol the user role in'),
+                        'roleshortname' => new external_value(PARAM_RAW, 'Role to assign to the user'),
+                        'useridnumber' => new external_value(PARAM_RAW, 'The user that is going to be enrolled'),
+                        'courseidnumber' => new external_value(PARAM_RAW, 'The course to enrol the user role in'),
                         'groups' => new external_multiple_structure(
                             new external_single_structure([
                                 'name' => new external_value(PARAM_ALPHANUMEXT,
@@ -215,8 +215,8 @@ class enrol_solaissits_external extends external_api {
             array(
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
-                        'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'The user that is going to be unenrolled'),
-                        'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'The course the user wil be unenrolled from')
+                        'useridnumber' => new external_value(PARAM_RAW, 'The user that is going to be unenrolled'),
+                        'courseidnumber' => new external_value(PARAM_RAW, 'The course the user wil be unenrolled from')
                     ])
                 )
             )

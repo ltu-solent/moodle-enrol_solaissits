@@ -67,6 +67,8 @@ class enrol_solaissits_external extends external_api {
      *
      * Function throws an exception at the first error encountered.
      * @param array $enrolments  An array of user enrolment
+     * @throws moodle_exception
+     * @throws invalid_parameter_exception
      */
     public static function enrol_users($enrolments) {
         global $CFG, $DB;
@@ -89,7 +91,9 @@ class enrol_solaissits_external extends external_api {
             // Ensure the current user is allowed to run this function in the enrolment context.
             $course = enrol_solaissits\helper::get_course_by_idnumber($enrolment['courseidnumber']);
             if (!$course) {
-                throw new moodle_exception('coursedoesntexist', 'enrol_solaissits');
+                throw new invalid_parameter_exception(
+                    get_string('coursedoesntexist', 'enrol_solaissits', $enrolment['courseidnumber'])
+                );
             }
             $context = context_course::instance($course->id, IGNORE_MISSING);
             self::validate_context($context);
@@ -99,7 +103,9 @@ class enrol_solaissits_external extends external_api {
             // Get the role from the shortname.
             $role = enrol_solaissits\helper::get_role_by_shortname($enrolment['roleshortname']);
             if (!$role) {
-                throw new moodle_exception('roledoesntexist', 'enrol_solaissits');
+                throw new invalid_parameter_exception(
+                    get_string('roledoesntexist', 'enrol_solaissits', $enrolment['roleshortname'])
+                );
             }
             // Throw an exception if user is not able to assign the role.
             $roles = get_assignable_roles($context);
@@ -113,7 +119,9 @@ class enrol_solaissits_external extends external_api {
 
             $user = enrol_solaissits\helper::get_user_by_idnumber($enrolment['useridnumber']);
             if (!$user) {
-                throw new moodle_exception('userdoesntexist', 'enrol_solaissits');
+                throw new invalid_parameter_exception(
+                    get_string('userdoesntexist', 'enrol_solaissits', $enrolment['useridnumber'])
+                );
             }
             // Check enrolment plugin instance is enabled/exists.
             $instance = null;
@@ -247,7 +255,9 @@ class enrol_solaissits_external extends external_api {
         foreach ($params['enrolments'] as $enrolment) {
             $course = enrol_solaissits\helper::get_course_by_idnumber($enrolment['courseidnumber']);
             if (!$course) {
-                throw new moodle_exception('coursedoesntexist', 'enrol_solaissits');
+                throw new invalid_parameter_exception(
+                    get_string('coursedoesntexist', 'enrol_solaissits', $enrolment['courseidnumber'])
+                );
             }
             $context = context_course::instance($course->id);
             self::validate_context($context);
@@ -258,7 +268,9 @@ class enrol_solaissits_external extends external_api {
             }
             $user = enrol_solaissits\helper::get_user_by_idnumber($enrolment['useridnumber']);
             if (!$user) {
-                throw new invalid_parameter_exception('User idnumber not exist: ' . $enrolment['useridnumber']);
+                throw new invalid_parameter_exception(
+                    get_string('userdoesntexist', 'enrol_solaissits', $enrolment['useridnumber'])
+                );
             }
             if (!$enrol->allow_unenrol($instance)) {
                 throw new moodle_exception('wscannotunenrol', 'enrol_solaissits', '', $enrolment);

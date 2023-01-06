@@ -98,6 +98,8 @@ class enrol_solaissits_external extends external_api {
             $context = context_course::instance($course->id, IGNORE_MISSING);
             self::validate_context($context);
 
+            // TODO: Only enrol someone if the template has been applied to the module / course
+
             // Check that the user has the permission to enrol with this method.
             require_capability('enrol/solaissits:enrol', $context);
             // Get the role from the shortname.

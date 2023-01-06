@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022111403;
+$plugin->version   = 2022111405;
 $plugin->release   = 2022111400;
 $plugin->requires  = 2020061500;
 $plugin->component = 'enrol_solaissits';

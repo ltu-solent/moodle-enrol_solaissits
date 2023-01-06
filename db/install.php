@@ -15,30 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Settings for SOL AIS-SITS integration
+ * Installation processes
  *
  * @package   enrol_solaissits
  * @author    Mark Sharp <mark.sharp@solent.ac.uk>
- * @copyright 2022 Solent University {@link https://www.solent.ac.uk}
+ * @copyright 2023 Solent University {@link https://www.solent.ac.uk}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-if ($ADMIN->fulltree) {
-    // Role unenrol actions.
-    // student:module:suspend
-    // student:course:unenrol
-    // Default: unenrol
-    // Will the logic for suspending or unenrolling students be in AIS?
-    if (!during_initial_install()) {
-        $settings->add(new admin_setting_heading('enrol_solaissits_roleactions',
-            new lang_string('roleactions', 'enrol_solaissits'),
-            new lang_string('roleactions_desc', 'enrol_solaissits')));
-        $roles = \enrol_solaissits\helper::get_roles();
-        foreach ($roles as $role) {
-            $settings->add(new \enrol_solaissits\admin\role_actions_setting($role));
-        }
-        unset($roles);
+function xmldb_enrol_solaissits_install() {
+    $roles = \enrol_solaissits\helper::get_roles();
+    foreach ($roles as $role) {
+        $settings = json_encode([
+            'course' => ENROL_EXT_REMOVED_UNENROL,
+            'module' => ENROL_EXT_REMOVED_UNENROL,
+        ]);
+        set_config('roleactions_' . $role->id, $settings, 'enrol_solaissits');
     }
 }

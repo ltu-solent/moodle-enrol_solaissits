@@ -26,12 +26,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['component'] = 'SOL AIS-SITS';
+$string['course'] = 'Course';
 $string['coursedoesntexist'] = 'Course doesn\'t exist: {$a}';
 
+$string['module'] = 'Module';
 $string['pluginname'] = 'Solent AIS-SITS';
 $string['pluginname_desc'] = 'An enrolment method for managing enrolments from Solent\'s AIS-SITS interface.';
 $string['pluginnotinstalled'] = 'Plugin not installed';
 
+$string['roleactions'] = 'Role enrolment actions';
+$string['roleactions_desc'] = 'Depending on the role and page type, a request to unenrol a user in a course will perform the following actions.';
 $string['roledoesntexist'] = 'Role doesn\'t exist: {$a}';
 
 $string['solaissits:config'] = 'Configure enrolment on payment enrol instances';

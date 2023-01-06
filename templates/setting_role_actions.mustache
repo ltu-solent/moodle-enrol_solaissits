@@ -1,0 +1,30 @@
+<div class="form-role_actions">
+    <div class="form-inline text-ltr">
+        <table class="table table-responsive">
+            <tr>
+                <th>
+                    <label for="{{id}}course">{{#str}} course , enrol_solaissits {{/str}}</label>
+                </th>
+                <td>
+                    <select id="{{id}}course" name="{{name}}[course]" class="custom-select" {{#readonly}}disabled{{/readonly}}>
+                        {{#courses}}
+                            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                        {{/courses}}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="{{id}}module">{{#str}} module, enrol_solaissits {{/str}}</label>
+                </th>
+                <td>
+                    <select id="{{id}}module" name="{{name}}[module]" class="custom-select" {{#readonly}}disabled{{/readonly}}>
+                        {{#modules}}
+                            <option value="{{value}}" {{#selected}}selected{{/selected}}>{{name}}</option>
+                        {{/modules}}
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

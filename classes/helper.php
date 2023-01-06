@@ -29,6 +29,10 @@ namespace enrol_solaissits;
  * Helper class
  */
 class helper {
+    // ENROL_EXT_REMOVED_UNENROL
+    // ENROL_EXT_REMOVED_KEEP
+    // ENROL_EXT_REMOVED_SUSPEND
+    // ENROL_EXT_REMOVED_SUSPENDNOROLES
     /**
      * Get course record by course idnumber
      *
@@ -69,5 +73,23 @@ class helper {
             return null; // Don't allow empty strings.
         }
         return $DB->get_record('user', ['idnumber' => $idnumber]);
+    }
+
+    /**
+     * Get roles that can be applied at course context level.
+     *
+     * @return array List of roles
+     */
+    public static function get_roles() {
+        global $DB;
+        // Only interested in roles that can be assigned at course context level.
+        $sql = "SELECT r.* FROM {role} r
+        JOIN {role_context_levels} rcl ON rcl.roleid = r.id AND rcl.contextlevel = :coursecontextlevel";
+        $params = [
+            'coursecontextlevel' => CONTEXT_COURSE
+        ];
+        $courseroles = $DB->get_records_sql($sql, $params);
+        $roles = role_fix_names($courseroles);
+        return $roles;
     }
 }

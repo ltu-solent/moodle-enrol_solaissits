@@ -32,7 +32,7 @@ jobs:
       matrix:
         include:
           - php: '8.0'
-            moodle-branch: 'MOODLE_400_STABLE'
+            moodle-branch: 'MOODLE_401_STABLE'
             database: 'mariadb'
           # Excluding pgsql for now as user field name is reserved.
           # - php: '7.4'

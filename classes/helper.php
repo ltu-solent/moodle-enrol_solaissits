@@ -29,10 +29,7 @@ namespace enrol_solaissits;
  * Helper class
  */
 class helper {
-    // ENROL_EXT_REMOVED_UNENROL
-    // ENROL_EXT_REMOVED_KEEP
-    // ENROL_EXT_REMOVED_SUSPEND
-    // ENROL_EXT_REMOVED_SUSPENDNOROLES
+
     /**
      * Get course record by course idnumber
      *

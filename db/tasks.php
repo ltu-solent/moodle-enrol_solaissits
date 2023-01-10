@@ -15,18 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * SOL AIS-SITS enrol version
+ * Tasks for processing enrolments
  *
  * @package   enrol_solaissits
  * @author    Mark Sharp <mark.sharp@solent.ac.uk>
- * @copyright 2022 Solent University {@link https://www.solent.ac.uk}
+ * @copyright 2023 Solent University {@link https://www.solent.ac.uk}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022111406;
-$plugin->release   = 2022111400;
-$plugin->requires  = 2020061500;
-$plugin->component = 'enrol_solaissits';
-// Need to include dependency on local_solaissits, and install it for testing.
+$tasks = [
+    [
+        'classname' => '\enrol_solaissits\task\sync_task',
+        'blocking' => 0,
+        'minute' => '15',
+        'hour' => '*',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*'
+    ]
+];

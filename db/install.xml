@@ -25,8 +25,8 @@
     <TABLE NAME="enrol_solaissits_groups" COMMENT="Group actions related to enrolments">
         <FIELDS>
             <FIELD NAME="id" SEQUENCE="true" TYPE="int" NOTNULL="true" LENGTH="10" />
-            <FIELD NAME="solaissitsid" SEQUENCE="false" TYPE="int" NOTNULL="true" />
-            <FIELD NAME="action" SEQUENCE="false" TYPE="char" NOTNULL="true" />
+            <FIELD NAME="solaissitsid" SEQUENCE="false" TYPE="int" NOTNULL="true" LENGTH="10" />
+            <FIELD NAME="action" SEQUENCE="false" TYPE="char" NOTNULL="true" LENGTH="30" />
             <FIELD NAME="groupname" SEQUENCE="false" TYPE="char" NOTNULL="true" LENGTH="255" />
         </FIELDS>
         <KEYS>

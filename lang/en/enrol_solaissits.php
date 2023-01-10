@@ -29,7 +29,12 @@ $string['component'] = 'SOL AIS-SITS';
 $string['course'] = 'Course';
 $string['coursedoesntexist'] = 'Course doesn\'t exist: {$a}';
 
+$string['enrolsync'] = 'Enrolment sync task';
+
+$string['invalidtimestartendvalues'] = 'Invalid timestart ({$a->timestart}) and timeend ({$a->timeend}) values';
+
 $string['module'] = 'Module';
+
 $string['pluginname'] = 'Solent AIS-SITS';
 $string['pluginname_desc'] = 'An enrolment method for managing enrolments from Solent\'s AIS-SITS interface.';
 $string['pluginnotinstalled'] = 'Plugin not installed';

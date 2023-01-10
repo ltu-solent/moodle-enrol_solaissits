@@ -25,9 +25,13 @@
 
 namespace enrol_solaissits;
 
+use context_course;
 use context_system;
+use core_customfield\data_controller;
+use core_customfield\field;
 use Exception;
 use externallib_advanced_testcase;
+use helper_trait;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -42,7 +46,6 @@ require_once($CFG->dirroot . '/enrol/solaissits/externallib.php');
  * Test externallib functions
  */
 class externallib_test extends externallib_advanced_testcase {
-
     /**
      * Test enrol users
      * @covers \enrol_solaissits_plugin::enrol_users()
@@ -77,6 +80,28 @@ class externallib_test extends externallib_advanced_testcase {
         $student2 = $this->getDataGenerator()->create_user(['idnumber' => 'Student2']);
         $unitleader = $this->getDataGenerator()->create_user(['idnumber' => 'UnitLeader1']);
         $externalexaminer = $this->getDataGenerator()->create_user(['idnumber' => 'ExternalExaminer1']);
+        // Set up customfields required for enrolments.
+        $fieldgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
+        $fieldcat = $fieldgenerator->create_category(
+            [
+                'name' => 'Student Records System',
+                'contextid' => context_system::instance()->id
+            ]
+        );
+        $templateappliedfield = $fieldgenerator->create_field([
+            'shortname' => 'templateapplied',
+            'categoryid' => $fieldcat->get('id'),
+            'type' => 'text'
+        ]);
+        $pagetypefield = $fieldgenerator->create_field([
+            'shortname' => 'pagetype',
+            'categoryid' => $fieldcat->get('id'),
+            'type' => 'text'
+        ]);
+        // Course 2 has had a template applied, and is a module pagetype.
+        // This is the minimum required for enrolments to happen using this method.
+        $fieldgenerator->add_instance_data($templateappliedfield, $course2->id, '1');
+        $fieldgenerator->add_instance_data($pagetypefield, $course2->id, 'module');
 
         $context1 = \context_course::instance($course1->id);
         $context2 = \context_course::instance($course2->id);
@@ -92,15 +117,24 @@ class externallib_test extends externallib_advanced_testcase {
         \enrol_solaissits_external::enrol_users([
             ['roleshortname' => 'student', 'useridnumber' => 'Student1', 'courseidnumber' => 'ABC101'],
             ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC101'],
-            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC101']
+            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC101'],
+            ['roleshortname' => 'student', 'useridnumber' => 'Student1', 'courseidnumber' => 'ABC102'],
+            ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC102'],
+            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102']
         ]);
         $instance1 = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
+        $instance2 = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
         $this->assertIsObject($instance1);
-        $this->assertEquals(3, $DB->count_records('user_enrolments', array('enrolid' => $instance1->id)));
-        $this->assertTrue(is_enrolled($context1, $student1, '', true));
-        $this->assertTrue(is_enrolled($context1, $unitleader, '', true));
-        $this->assertTrue(is_enrolled($context1, $externalexaminer, '', true));
-        $this->assertFalse(is_enrolled($context1, $student2, '', true));
+        // The template hasn't been applied to course1, so these are queued, but course2 enrolments have been successful.
+        $this->assertEquals(0, $DB->count_records('user_enrolments', array('enrolid' => $instance1->id)));
+        $this->assertEquals(3, $DB->count_records('enrol_solaissits'));
+        $this->assertEquals(3, $DB->count_records('user_enrolments', array('enrolid' => $instance2->id)));
+        $this->assertTrue(is_enrolled($context2, $student1, '', true));
+        $this->assertTrue(is_enrolled($context2, $unitleader, '', true));
+        $this->assertTrue(is_enrolled($context2, $externalexaminer, '', true));
+        $this->assertFalse(is_enrolled($context1, $student1, '', true));
+        $this->assertFalse(is_enrolled($context1, $unitleader, '', true));
+        $this->assertFalse(is_enrolled($context1, $externalexaminer, '', true));
         // No-one's been added to a group, so no groups exist.
         // I've not switched on group mode for this course, but I don't think it matters.
         $groups = groups_get_all_groups($course1->id);
@@ -109,7 +143,7 @@ class externallib_test extends externallib_advanced_testcase {
             [
                 'roleshortname' => 'student',
                 'useridnumber' => 'Student1',
-                'courseidnumber' => 'ABC101',
+                'courseidnumber' => 'ABC102',
                 'groups' => [
                     [
                         'name' => 'L4'
@@ -117,7 +151,7 @@ class externallib_test extends externallib_advanced_testcase {
                 ]
             ]
         ]);
-        $groups = groups_get_all_groups($course1->id);
+        $groups = groups_get_all_groups($course2->id);
         $this->assertCount(1, $groups);
         $firstgroup = reset($groups);
         $this->assertTrue(groups_is_member($firstgroup->id, $student1->id));
@@ -127,7 +161,7 @@ class externallib_test extends externallib_advanced_testcase {
             [
                 'roleshortname' => 'student',
                 'useridnumber' => 'Student1',
-                'courseidnumber' => 'ABC101',
+                'courseidnumber' => 'ABC102',
                 'groups' => [
                     [
                         'name' => 'L5' // Default action is 'add'.
@@ -139,7 +173,7 @@ class externallib_test extends externallib_advanced_testcase {
                 ]
             ]
         ]);
-        $groups = groups_get_all_groups($course1->id);
+        $groups = groups_get_all_groups($course2->id);
         $this->assertCount(2, $groups);
         foreach ($groups as $group) {
             if ($group->name == 'L4') {
@@ -154,11 +188,11 @@ class externallib_test extends externallib_advanced_testcase {
             [
                 'roleshortname' => 'student',
                 'useridnumber' => 'Student1',
-                'courseidnumber' => 'ABC101',
+                'courseidnumber' => 'ABC102',
                 'suspend' => 1
             ]
         ]);
-        $this->assertFalse(is_enrolled($context1, $student1, '', true)); // Excludes suspended users.
+        $this->assertFalse(is_enrolled($context2, $student1, '', true)); // Excludes suspended users.
 
         // Tests with some bad data.
         // As it stands if a user, course, role doesn't exist an exception will be thrown.
@@ -196,13 +230,37 @@ class externallib_test extends externallib_advanced_testcase {
         $this->assignUserCapability('enrol/solaissits:unenrol', $coursecontext, $roleid);
         $this->assignUserCapability('moodle/course:view', $coursecontext, $roleid);
         $this->assignUserCapability('moodle/role:assign', $coursecontext, $roleid);
+
+        // Set up customfields required for enrolments.
+        $fieldgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
+        $fieldcat = $fieldgenerator->create_category(
+            [
+                'name' => 'Student Records System',
+                'contextid' => context_system::instance()->id
+            ]
+        );
+        $templateappliedfield = $fieldgenerator->create_field([
+            'shortname' => 'templateapplied',
+            'categoryid' => $fieldcat->get('id'),
+            'type' => 'text'
+        ]);
+        $pagetypefield = $fieldgenerator->create_field([
+            'shortname' => 'pagetype',
+            'categoryid' => $fieldcat->get('id'),
+            'type' => 'text'
+        ]);
+        // Course has had a template applied, and is a module pagetype.
+        // This is the minimum required for unenrolments to happen using this method.
+        $fieldgenerator->add_instance_data($templateappliedfield, $course->id, '1');
+        $fieldgenerator->add_instance_data($pagetypefield, $course->id, 'module');
+
         // Create a student and enrol them into the course.
         $student = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);
         $enrol->enrol_user($enrolinstance, $student->id);
         $this->assertTrue(is_enrolled($coursecontext, $student));
         // Call the web service to unenrol.
         \enrol_solaissits_external::unenrol_users([
-            ['useridnumber' => $student->idnumber, 'courseidnumber' => $course->idnumber]
+            ['useridnumber' => $student->idnumber, 'courseidnumber' => $course->idnumber, 'roleshortname' => 'student']
         ]);
         $this->assertFalse(is_enrolled($coursecontext, $student));
     }

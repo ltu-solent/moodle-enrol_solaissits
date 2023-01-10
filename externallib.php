@@ -98,8 +98,6 @@ class enrol_solaissits_external extends external_api {
             $context = context_course::instance($course->id, IGNORE_MISSING);
             self::validate_context($context);
 
-            // TODO: Only enrol someone if the template has been applied to the module / course
-
             // Check that the user has the permission to enrol with this method.
             require_capability('enrol/solaissits:enrol', $context);
             // Get the role from the shortname.
@@ -125,6 +123,18 @@ class enrol_solaissits_external extends external_api {
                     get_string('userdoesntexist', 'enrol_solaissits', $enrolment['useridnumber'])
                 );
             }
+
+            // Validate timestart and timeend.
+            $timestart = $enrolment['timestart'] ?? 0;
+            $timeend = $enrolment['timeend'] ?? 0;
+            if ($timeend > $timestart && $timeend != 0) {
+                throw new invalid_parameter_exception(
+                    get_string('invalidtimestartendvalues', 'enrol_solaissits', [
+                        'timestart' => $timestart,
+                        'timeend' => $timeend])
+                );
+            }
+
             // Check enrolment plugin instance is enabled/exists.
             $instance = null;
             $enrolinstances = enrol_get_instances($course->id, true);
@@ -135,13 +145,12 @@ class enrol_solaissits_external extends external_api {
                 }
             }
             if (empty($instance)) {
-                // Create an instance.
+                // Create an instance if it doesn't exist, even though it might be deleted later.
                 $instanceid = $enrol->add_instance($course);
                 $instances = enrol_get_instances($course->id, true);
                 $instance = $instances[$instanceid];
             }
-
-            // Check that the plugin allows this enrolment.
+            // Check that the plugin allows this enrolment from this user.
             if (!$enrol->allow_enrol($instance)) {
                 $errorparams = new stdClass();
                 $errorparams->roleid = $enrolment['roleshortname'];
@@ -150,56 +159,23 @@ class enrol_solaissits_external extends external_api {
                 throw new moodle_exception('wscannotenrol', 'enrol_solaissits', '', $errorparams);
             }
 
-            // Finally proceed with the enrolment.
-            $enrolment['timestart'] = isset($enrolment['timestart']) ? $enrolment['timestart'] : 0;
-            $enrolment['timeend'] = isset($enrolment['timeend']) ? $enrolment['timeend'] : 0;
-            $enrolment['status'] = (isset($enrolment['suspend']) && !empty($enrolment['suspend'])) ?
-                    ENROL_USER_SUSPENDED : ENROL_USER_ACTIVE;
-
-            // If the user exists and the timestart, timeend or status is different, this automatically changes to an update.
-            $enrol->enrol_user($instance, $user->id, $role->id,
-                    $enrolment['timestart'], $enrolment['timeend'], $enrolment['status']);
-
-            // Add user to groups, if set, or move if group membership has changed.
-            // This requires that we are told of membership changes, not just additions.
-            // Unenrolements will automatically deal with group membership.
-            $usergroups = $enrolment['groups'] ?? [];
-            $coursegroups = groups_get_course_data($course->id);
-            foreach ($usergroups as $usergroup) {
-                $existinggroups = array_filter($coursegroups->groups, function($coursegroup) use ($usergroup) {
-                    return ($usergroup['name'] == $coursegroup->name);
-                });
-                // Does the group exist?
-                $group = null;
-                if (count($existinggroups) == 0) {
-                    // Create the group.
-                    $group = new stdClass();
-                    $group->name = $usergroup['name'];
-                    $group->courseid = $course->id;
-                    $groupid = groups_create_group($group);
-                    if ($groupid) {
-                        $group->id = $groupid;
-                    }
-                } else if (count($existinggroups) === 1) {
-                    $group = reset($existinggroups);
-                } else {
-                    // This shouldn't happen. Is it possible to have two groups with the same name?
-                    // Not through the UI, but possible programatically. Get the first one anyway.
-                    $group = reset($existinggroups);
-                }
-                $action = $usergroup['action'] ?? 'add'; // Default action.
-                // Do the appropriate group membership action.
-                if ($action == 'add') {
-                    if (!groups_is_member($group->id, $user->id)) {
-                        groups_add_member($group->id, $user);
-                    }
-                }
-                if ($action == 'del') {
-                    if (groups_is_member($group->id, $user->id)) {
-                        groups_remove_member($group->id, $user);
-                    }
-                }
+            $action = 'add';
+            $suspend = isset($enrolment['suspend']) ? $enrolment['suspend'] : null;
+            if ($suspend === 1) {
+                $action = 'suspend';
             }
+            if ($suspend === 0) {
+                $action = 'unsuspend';
+            }
+            $data = new stdClass();
+            $data->action = $action;
+            $data->userid = $user->id;
+            $data->courseid = $course->id;
+            $data->roleid = $role->id;
+            $data->timestart = $timestart;
+            $data->timeend = $timeend;
+            $data->groups = $enrolment['groups'] ?? [];
+            $enrol->external_enrol_user($data);
         }
 
         // Because I'm creating enrolment instances etc, perhaps I shouldn't have transactions.
@@ -226,7 +202,8 @@ class enrol_solaissits_external extends external_api {
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
                         'useridnumber' => new external_value(PARAM_RAW, 'The user that is going to be unenrolled'),
-                        'courseidnumber' => new external_value(PARAM_RAW, 'The course the user wil be unenrolled from')
+                        'courseidnumber' => new external_value(PARAM_RAW, 'The course the user wil be unenrolled from'),
+                        'roleshortname' => new external_value(PARAM_RAW, 'Role to remove from the user'),
                     ])
                 )
             )
@@ -277,7 +254,23 @@ class enrol_solaissits_external extends external_api {
             if (!$enrol->allow_unenrol($instance)) {
                 throw new moodle_exception('wscannotunenrol', 'enrol_solaissits', '', $enrolment);
             }
-            $enrol->unenrol_user($instance, $user->id);
+            // Get the role from the shortname.
+            $role = enrol_solaissits\helper::get_role_by_shortname($enrolment['roleshortname']);
+            if (!$role) {
+                throw new invalid_parameter_exception(
+                    get_string('roledoesntexist', 'enrol_solaissits', $enrolment['roleshortname'])
+                );
+            }
+
+            $data = new stdClass();
+            $data->action = 'del';
+            $data->userid = $user->id;
+            $data->courseid = $course->id;
+            $data->roleid = $role->id;
+            $data->timestart = 0;
+            $data->timeend = 0;
+            $data->groups = [];
+            $enrol->external_unenrol_user($data);
         }
         $transaction->allow_commit();
     }

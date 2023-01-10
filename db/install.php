@@ -23,8 +23,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Install hook
+ *
+ * @return void
+ */
 function xmldb_enrol_solaissits_install() {
     $roles = \enrol_solaissits\helper::get_roles();
     foreach ($roles as $role) {

@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/group/lib.php');
+require_once($CFG->dirroot . '/local/solsits/classes/helper.php');
 
 /**
  * SOL AIS-SITS enrolment class

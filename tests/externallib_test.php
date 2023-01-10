@@ -25,17 +25,11 @@
 
 namespace enrol_solaissits;
 
-use context_course;
 use context_system;
-use core_customfield\data_controller;
-use core_customfield\field;
-use Exception;
 use externallib_advanced_testcase;
-use helper_trait;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
-
 global $CFG;
 
 require_once($CFG->libdir . '/enrollib.php');

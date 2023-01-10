@@ -25,6 +25,8 @@
 
 namespace enrol_solaissits;
 
+use core_course\customfield\course_handler;
+
 /**
  * Helper class
  */
@@ -88,5 +90,53 @@ class helper {
         $courseroles = $DB->get_records_sql($sql, $params);
         $roles = role_fix_names($courseroles);
         return $roles;
+    }
+
+    /**
+     * Check to see if a template has been applied to this course.
+     *
+     * @param int $courseid
+     * @return boolean
+     */
+    public static function istemplated($courseid): bool {
+        $value = static::get_customfield($courseid, 'templateapplied');
+        if ($value == null) {
+            return false;
+        }
+        return (bool)$value;
+    }
+
+    /**
+     * Get pagetype for given course
+     *
+     * @param int $courseid
+     * @return string
+     */
+    public static function get_pagetype($courseid): string {
+        return static::get_customfield($courseid, 'pagetype');
+    }
+
+    /**
+     * Get any customfield value for given course and field name
+     *
+     * @param int $courseid
+     * @param string $shortname
+     * @return mixed
+     */
+    public static function get_customfield($courseid, $shortname) {
+        $handler = course_handler::create();
+        $datas = $handler->get_instance_data($courseid, true);
+        foreach ($datas as $data) {
+            $fieldname = $data->get_field()->get('shortname');
+            if ($fieldname != $shortname) {
+                continue;
+            }
+            $value = $data->get_value();
+            if (empty($value)) {
+                continue;
+            }
+            return $value;
+        }
+        return null;
     }
 }

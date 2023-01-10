@@ -29,7 +29,3 @@ $plugin->version   = 2022111406;
 $plugin->release   = 2022111400;
 $plugin->requires  = 2020061500;
 $plugin->component = 'enrol_solaissits';
-$plugin->dependencies = [
-    'local_solsits' => 2022060602
-];
-// Need to include dependency on local_solaissits, and install it for testing.

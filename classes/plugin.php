@@ -26,7 +26,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/group/lib.php');
-require_once($CFG->dirroot . '/local/solsits/classes/helper.php');
 
 /**
  * SOL AIS-SITS enrolment class
@@ -99,7 +98,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
 
         // We only actually enrol when a course has had its template applied.
         // Otherwise the enrolment would be deleted when the template is applied.
-        $iscourseready = \local_solsits\helper::istemplated($course->id);
+        $iscourseready = \enrol_solaissits\helper::istemplated($course->id);
         // Are there already queued actions for this enrolment. We don't want these to be applied out of turn.
         // If there are, we enqueue to retain the ordering of actions.
         $hasqueueditems = $this->get_queued_items_for($data->userid, $data->courseid);
@@ -149,7 +148,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
 
         // We only actually enrol when a course has had its template applied.
         // Otherwise the enrolment would be deleted when the template is applied.
-        $iscourseready = \local_solsits\helper::istemplated($data->courseid);
+        $iscourseready = \enrol_solaissits\helper::istemplated($data->courseid);
         // Are there already queued actions for this enrolment. We don't want these to be applied out of turn.
         // If there are, we enqueue to retain the ordering of actions.
         $hasqueueditems = $this->get_queued_items_for($data->userid, $data->courseid);
@@ -184,7 +183,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         // Perhaps there should be a back-up.
         // Do we want all enrolments to be deleted?
         $configuredaction = json_decode($this->get_config('roleactions_' . $data->roleid, $default));
-        $pagetype = \local_solsits\helper::get_customfield($data->courseid, 'pagetype');
+        $pagetype = \enrol_solaissits\helper::get_customfield($data->courseid, 'pagetype');
         $action = $configuredaction->{$pagetype} ?? ENROL_EXT_REMOVED_UNENROL;
         if ($action == ENROL_EXT_REMOVED_KEEP) {
             return;
@@ -497,7 +496,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
             // We only actually enrol when a course has had its template applied.
             // Otherwise the enrolment will be deleted when the template is applied.
             // But unenrolments can be applied no matter.
-            $iscourseready = \local_solsits\helper::istemplated($course->id);
+            $iscourseready = \enrol_solaissits\helper::istemplated($course->id);
             if (!$iscourseready && $data->action == 'add') {
                 $trace->output($course->shortname . " hasn't had its template applied yet.");
                 continue;

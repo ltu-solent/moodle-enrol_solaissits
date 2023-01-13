@@ -35,9 +35,6 @@ $PAGE->set_pagelayout('report');
 $download = optional_param('download', '', PARAM_ALPHA);
 $PAGE->set_title(get_string('queueditemsheading', 'enrol_solaissits'));
 $PAGE->set_heading(get_string('queueditemsheading', 'enrol_solaissits'));
-// $PAGE->navbar->add(get_string('enrolments', 'enrol'), new moodle_url('/admin/category.php?category=enrolments'));
-// $PAGE->navbar->add(get_string('pluginname', 'enrol_solaissits'), new moodle_url('/admin/settings.php?section=enrolsettingssolaissits'));
-// $PAGE->navbar->add(get_string('queueditemsheading', 'enrol_solaissits'), new moodle_url('/enrol/solaissits/queueditems.php'));
 
 $table = new \enrol_solaissits\tables\queued_items('solaissitsqueueditems');
 

@@ -34,15 +34,15 @@ $ADMIN->add('enrolsolaissitsfolder', new admin_externalpage(
 // Prevent duplicate admin settings page error.
 $settings = null;
 if ($ADMIN->fulltree) {
-    $settings_page = new admin_settingpage($section, new lang_string('settings', 'enrol_solaissits'));
-    $ADMIN->add('enrolsolaissitsfolder', $settings_page);
+    $settingspage = new admin_settingpage($section, new lang_string('settings', 'enrol_solaissits'));
+    $ADMIN->add('enrolsolaissitsfolder', $settingspage);
     if (!during_initial_install()) {
-        $settings_page->add(new admin_setting_heading('enrol_solaissits_roleactions',
+        $settingspage->add(new admin_setting_heading('enrol_solaissits_roleactions',
             new lang_string('roleactions', 'enrol_solaissits'),
             new lang_string('roleactions_desc', 'enrol_solaissits')));
         $roles = \enrol_solaissits\helper::get_roles();
         foreach ($roles as $role) {
-            $settings_page->add(new \enrol_solaissits\admin\role_actions_setting($role));
+            $settingspage->add(new \enrol_solaissits\admin\role_actions_setting($role));
         }
         unset($roles);
     }

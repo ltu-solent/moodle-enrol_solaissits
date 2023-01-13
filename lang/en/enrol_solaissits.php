@@ -31,6 +31,7 @@ $string['coursedoesntexist'] = 'Course doesn\'t exist: {$a}';
 
 $string['enrolsync'] = 'Enrolment sync task';
 
+$string['id'] = 'ID';
 $string['invalidtimestartendvalues'] = 'Invalid timestart ({$a->timestart}) and timeend ({$a->timeend}) values';
 
 $string['module'] = 'Module';
@@ -39,14 +40,22 @@ $string['pluginname'] = 'Solent AIS-SITS';
 $string['pluginname_desc'] = 'An enrolment method for managing enrolments from Solent\'s AIS-SITS interface.';
 $string['pluginnotinstalled'] = 'Plugin not installed';
 
+$string['queueditems'] = 'Queued items';
+$string['queueditemsheading'] = 'Queued enrolment items from SITS';
+
 $string['roleactions'] = 'Role enrolment actions';
 $string['roleactions_desc'] = 'Depending on the role and page type, a request to unenrol a user in a course will perform the following actions.';
 $string['roledoesntexist'] = 'Role doesn\'t exist: {$a}';
 
+$string['settings'] = 'Settings';
 $string['solaissits:config'] = 'Configure enrolment on payment enrol instances';
 $string['solaissits:enrol'] = 'Enrol users on course';
 $string['solaissits:manage'] = 'Manage enrolled users';
 $string['solaissits:unenrol'] = 'Unenrol users from course';
+
+$string['timeend'] = 'Enrolment ends';
+$string['timemodified'] = 'Last modified';
+$string['timestart'] = 'Enrolment begins';
 
 $string['userdoesntexist'] = 'User doesn\'t exist: {$a}';
 

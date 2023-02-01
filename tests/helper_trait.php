@@ -27,7 +27,6 @@ namespace enrol_solaissits;
 
 use context_system;
 
-
 trait helper_trait {
 
     /**
@@ -70,6 +69,7 @@ trait helper_trait {
 
         // Set the required capabilities by the external function.
         $wsroleid = $this->assignUserCapability('enrol/solaissits:enrol', $systemcontext->id);
+        $this->assignUserCapability('enrol/solaissits:unenrol', $systemcontext, $wsroleid);
         $this->assignUserCapability('moodle/course:view', $systemcontext->id, $wsroleid);
         $this->assignUserCapability('moodle/role:assign', $systemcontext->id, $wsroleid);
         $this->assignUserCapability('moodle/course:viewparticipants', $systemcontext->id, $wsroleid);

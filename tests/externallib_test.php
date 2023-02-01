@@ -25,7 +25,6 @@
 
 namespace enrol_solaissits;
 
-use context_system;
 use externallib_advanced_testcase;
 use moodle_exception;
 
@@ -50,26 +49,7 @@ class externallib_test extends externallib_advanced_testcase {
     public function test_enrol_users() {
         global $DB;
         $this->resetAfterTest();
-        // Plugin isn't automatically enabled.
-        $this->enable_plugin();
-
-        $wsuser = $this->getDataGenerator()->create_user();
-        $systemcontext = context_system::instance();
-        $this->setUser($wsuser);
-
-        // Set the required capabilities by the external function.
-        $wsroleid = $this->assignUserCapability('enrol/solaissits:enrol', $systemcontext->id);
-        $this->assignUserCapability('moodle/course:view', $systemcontext->id, $wsroleid);
-        $this->assignUserCapability('moodle/role:assign', $systemcontext->id, $wsroleid);
-        set_role_contextlevels($wsroleid, [CONTEXT_SYSTEM, CONTEXT_COURSE]);
-
-        // Student role already exists, but create unitleader and externalexaminer.
-        $unitleaderrole = $this->getDataGenerator()->create_role(['name' => 'Module leader', 'shortname' => 'unitleader']);
-        $externalexaminerrole = $this->getDataGenerator()->create_role([
-            'name' => 'External Examiner', 'shortname' => 'externalexaminer']);
-        core_role_set_assign_allowed($wsroleid, 5); // Student.
-        core_role_set_assign_allowed($wsroleid, $unitleaderrole);
-        core_role_set_assign_allowed($wsroleid, $externalexaminerrole);
+        $this->setup_enrol();
 
         $course1 = $this->getDataGenerator()->create_course(['idnumber' => 'ABC101']);
         $course2 = $this->getDataGenerator()->create_course(['idnumber' => 'ABC102']);
@@ -78,27 +58,15 @@ class externallib_test extends externallib_advanced_testcase {
         $unitleader = $this->getDataGenerator()->create_user(['idnumber' => 'UnitLeader1']);
         $externalexaminer = $this->getDataGenerator()->create_user(['idnumber' => 'ExternalExaminer1']);
         // Set up customfields required for enrolments.
-        $fieldgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
-        $fieldcat = $fieldgenerator->create_category(
-            [
-                'name' => 'Student Records System',
-                'contextid' => context_system::instance()->id
-            ]
-        );
-        $templateappliedfield = $fieldgenerator->create_field([
-            'shortname' => 'templateapplied',
-            'categoryid' => $fieldcat->get('id'),
-            'type' => 'text'
-        ]);
-        $pagetypefield = $fieldgenerator->create_field([
-            'shortname' => 'pagetype',
-            'categoryid' => $fieldcat->get('id'),
-            'type' => 'text'
-        ]);
+        $fieldgenerator = $this->setup_customfields();
         // Course 2 has had a template applied, and is a module pagetype.
         // This is the minimum required for enrolments to happen using this method.
-        $fieldgenerator->add_instance_data($templateappliedfield, $course2->id, '1');
-        $fieldgenerator->add_instance_data($pagetypefield, $course2->id, 'module');
+        $this->set_customfields($course2->id, [
+                'templateapplied' => 1,
+                'pagetype' => 'module'
+            ],
+            $fieldgenerator
+        );
 
         $context1 = \context_course::instance($course1->id);
         $context2 = \context_course::instance($course2->id);
@@ -210,46 +178,23 @@ class externallib_test extends externallib_advanced_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
-        // Plugin isn't automatically enabled.
-        $this->enable_plugin();
-
-        // The user who perform the action.
-        $user = $this->getDataGenerator()->create_user();
-        $this->setUser($user); // Log this user in.
+        $this->setup_enrol();
         $enrol = enrol_get_plugin('solaissits');
         // Create a course.
         $course = self::getDataGenerator()->create_course(['idnumber' => 'ABC101']);
         $enrol->add_instance($course);
         $coursecontext = \context_course::instance($course->id);
         $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
-        // Set the capability for the user.
-        $roleid = $this->assignUserCapability('enrol/solaissits:enrol', $coursecontext);
-        $this->assignUserCapability('enrol/solaissits:unenrol', $coursecontext, $roleid);
-        $this->assignUserCapability('moodle/course:view', $coursecontext, $roleid);
-        $this->assignUserCapability('moodle/role:assign', $coursecontext, $roleid);
 
-        // Set up customfields required for enrolments.
-        $fieldgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
-        $fieldcat = $fieldgenerator->create_category(
-            [
-                'name' => 'Student Records System',
-                'contextid' => context_system::instance()->id
-            ]
-        );
-        $templateappliedfield = $fieldgenerator->create_field([
-            'shortname' => 'templateapplied',
-            'categoryid' => $fieldcat->get('id'),
-            'type' => 'text'
-        ]);
-        $pagetypefield = $fieldgenerator->create_field([
-            'shortname' => 'pagetype',
-            'categoryid' => $fieldcat->get('id'),
-            'type' => 'text'
-        ]);
+        $fieldgenerator = $this->setup_customfields();
         // Course has had a template applied, and is a module pagetype.
         // This is the minimum required for unenrolments to happen using this method.
-        $fieldgenerator->add_instance_data($templateappliedfield, $course->id, '1');
-        $fieldgenerator->add_instance_data($pagetypefield, $course->id, 'module');
+        $this->set_customfields($course->id, [
+                'templateapplied' => 1,
+                'pagetype' => 'module'
+            ],
+            $fieldgenerator
+        );
 
         // Create a student and enrol them into the course.
         $student = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);
@@ -272,7 +217,7 @@ class externallib_test extends externallib_advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        $enrols = $this->setup_enrol();
+        $this->setup_enrol();
         $course1 = $this->getDataGenerator()->create_course(['idnumber' => 'ABC101']);
         $course2 = $this->getDataGenerator()->create_course(['idnumber' => 'ABC102']);
         $student1 = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);

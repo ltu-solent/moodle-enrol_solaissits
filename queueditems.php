@@ -25,13 +25,22 @@
 
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+$params = [
+    'page' => optional_param('page', 0, PARAM_INT),
+    'tdir' => optional_param('tdir', null, PARAM_INT),
+    'thide' => optional_param('thide', null, PARAM_ALPHANUMEXT),
+    'tifirst' => optional_param('tifirst', '', PARAM_RAW),
+    'tilast' => optional_param('tilast', null, PARAM_RAW),
+    'treset' => optional_param('treset', null, PARAM_BOOL),
+    'tshow' => optional_param('tshow', null, PARAM_ALPHANUMEXT),
+    'tsort' => optional_param('tsort', null, PARAM_ALPHANUMEXT),
 
-require_login();
-require_capability('enrol/solaissits:manage', context_system::instance());
+];
+$pageurl = new moodle_url('/enrol/solaissits/queueditems.php', $params);
 admin_externalpage_setup('enrol_solaissits_queueditems');
+
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/enrol/solaissits/queueditems.php');
-$PAGE->set_pagelayout('report');
+
 $download = optional_param('download', '', PARAM_ALPHA);
 $PAGE->set_title(get_string('queueditemsheading', 'enrol_solaissits'));
 $PAGE->set_heading(get_string('queueditemsheading', 'enrol_solaissits'));

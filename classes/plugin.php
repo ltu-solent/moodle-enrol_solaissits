@@ -389,20 +389,69 @@ class enrol_solaissits_plugin extends enrol_plugin {
      * @param int $courseid
      * @return array List of enrolment records
      */
-    private function get_queued_items_for($userid, $courseid) {
+    public function get_queued_items_for($userid, $courseid) {
         global $DB;
         $items = $DB->get_records('enrol_solaissits', ['userid' => $userid, 'courseid' => $courseid]);
-        foreach ($items as $item) {
-            $item->groups = [];
+        foreach ($items as $key => $item) {
+            $items[$key]->groups = [];
             $groupactions = $DB->get_records('enrol_solaissits_groups', ['solaissitsid' => $item->id]);
             foreach ($groupactions as $groupaction) {
-                $item->groups[] = [
+                $items[$key]->groups[] = [
                     'name' => $groupaction->groupname,
                     'action' => $groupaction->action
                 ];
             }
         }
-        return $items;
+        return array_values($items);
+    }
+
+    /**
+     * Get enrolments for a given user on a given course
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @return stdClass
+     */
+    public function get_enrolments_for($userid, $courseid) {
+        global $DB;
+        $enrol = $DB->get_record('enrol', array('courseid' => $courseid, 'enrol' => 'solaissits'));
+        $user = $DB->get_record('user', ['id' => $userid]);
+        $course = $DB->get_record('course', ['id' => $courseid]);
+        $context = context_course::instance($course->id);
+        $results = new stdClass();
+        $results->user = (object)user_get_user_details($user);
+        $results->course = $course;
+        $results->enrolments = [];
+
+        $sql = "SELECT ue.id, ue.status, ue.enrolid, ue.timestart, ue.timeend
+        FROM {enrol} e
+        JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.userid = :userid
+        WHERE e.courseid = :courseid AND e.enrol = 'solaissits'";
+        $params = [
+            'userid' => $userid,
+            'courseid' => $courseid
+        ];
+        $enrolments = $DB->get_records_sql($sql, $params);
+        foreach ($enrolments as $enrolment) {
+            $roleassignments = $DB->get_records_sql(
+                "SELECT ra.id, ra.roleid, r.shortname
+                FROM {role_assignments} ra
+                JOIN {role} r ON r.id = ra.roleid
+                WHERE ra.contextid = :contextid
+                    AND ra.userid = :userid
+                    AND ra.component = 'enrol_solaissits'
+                    AND ra.itemid = :enrolid",
+                [
+                    'contextid' => $context->id,
+                    'enrolid' => $enrolment->enrolid,
+                    'userid' => $user->id
+                ]
+            );
+            $enrolment->roles = array_values($roleassignments);
+            $results->enrolments[] = $enrolment;
+        }
+        $results->queueditems = $this->get_queued_items_for($user->id, $course->id);
+        return $results;
     }
 
     /**

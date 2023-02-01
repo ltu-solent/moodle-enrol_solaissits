@@ -369,15 +369,12 @@ class enrol_solaissits_plugin extends enrol_plugin {
             }
             $action = $usergroup['action'] ?? 'add'; // Default action.
             // Do the appropriate group membership action.
-            if ($action == 'add') {
-                if (!groups_is_member($group->id, $user->id)) {
-                    groups_add_member($group->id, $user);
-                }
+            $ismember = groups_is_member($group->id, $user->id);
+            if ($action == 'add' && !$ismember) {
+                groups_add_member($group->id, $user);
             }
-            if ($action == 'del') {
-                if (groups_is_member($group->id, $user->id)) {
-                    groups_remove_member($group->id, $user);
-                }
+            if ($action == 'del' && $ismember) {
+                groups_remove_member($group->id, $user);
             }
         }
     }
@@ -550,21 +547,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 $trace->output($course->shortname . " hasn't had its template applied yet.");
                 continue;
             }
-            // Check enrolment plugin instance is enabled/exists.
-            $instance = null;
-            $enrolinstances = enrol_get_instances($course->id, true);
-            foreach ($enrolinstances as $courseenrolinstance) {
-                if ($courseenrolinstance->enrol == "solaissits") {
-                    $instance = $courseenrolinstance;
-                    break;
-                }
-            }
-            if (empty($instance)) {
-                // Create an instance if it doesn't exist.
-                $instanceid = $this->add_instance($course);
-                $instances = enrol_get_instances($course->id, true);
-                $instance = $instances[$instanceid];
-            }
+            $instance = $this->get_enrol_instance($course);
 
             if (!isset($data->groups)) {
                 // Get groups associated with the enrolment.
@@ -602,5 +585,30 @@ class enrol_solaissits_plugin extends enrol_plugin {
         }
         $trace->finished();
         return true;
+    }
+
+    /**
+     * Gets the enrol instance for this course, or creates it if it doesn't.
+     *
+     * @param stdClass $course
+     * @return stdClass
+     */
+    private function get_enrol_instance($course) {
+        // Check enrolment plugin instance is enabled/exists.
+        $instance = null;
+        $enrolinstances = enrol_get_instances($course->id, true);
+        foreach ($enrolinstances as $courseenrolinstance) {
+            if ($courseenrolinstance->enrol == "solaissits") {
+                $instance = $courseenrolinstance;
+                break;
+            }
+        }
+        if (empty($instance)) {
+            // Create an instance if it doesn't exist.
+            $instanceid = $this->add_instance($course);
+            $instances = enrol_get_instances($course->id, true);
+            $instance = $instances[$instanceid];
+        }
+        return $instance;
     }
 }

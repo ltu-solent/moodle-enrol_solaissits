@@ -97,12 +97,11 @@ trait helper_trait {
     }
 
     /**
-     * Setup the course custom fields
+     * Setup the course custom fields required for enrolments
      *
      * @return array [fieldgenerator, templateappliedfield, pagetypefield]
      */
     public function setup_customfields() {
-        // Set up customfields required for enrolments.
         $fieldgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
         $fieldcat = $fieldgenerator->create_category(
             [
@@ -128,23 +127,29 @@ trait helper_trait {
     }
 
     /**
-     * Set custom course fields to given values
+     * Set custom course fields to given values. Can only be used to set initial values.
+     * Changes must be managed via the data_controller for the field.
      *
      * @param int $courseid
      * @param array $values Field name keys
      * @param array $fieldgenerator Returned from setup_customfields.
-     * @return void
+     * @return array Array of data_controllers
      */
     public function set_customfields($courseid, $values, $fieldgenerator) {
+        $data = [];
         // This is the minimum required for enrolments to happen using this method.
-        $fieldgenerator['generator']->add_instance_data(
-            $fieldgenerator['templateappliedfield'],
-            $courseid,
-            $values['templateapplied']);
-
-            $fieldgenerator['generator']->add_instance_data(
-            $fieldgenerator['pagetypefield'],
-            $courseid,
-            $values['pagetype']);
+        if (isset($values['templateapplied'])) {
+            $data['templateapplied'] = $fieldgenerator['generator']->add_instance_data(
+                $fieldgenerator['templateappliedfield'],
+                $courseid,
+                $values['templateapplied']);
+        }
+        if (isset($values['pagetype'])) {
+            $data['pagetype'] = $fieldgenerator['generator']->add_instance_data(
+                $fieldgenerator['pagetypefield'],
+                $courseid,
+                $values['pagetype']);
+        }
+        return $data;
     }
 }

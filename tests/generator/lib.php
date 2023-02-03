@@ -65,10 +65,10 @@ class enrol_solaissits_generator extends component_generator_base {
             throw new moodle_exception('useridnotset', 'enrol_solaissits');
         }
         $user = $DB->record_exists('user', ['id' => $record->userid], MUST_EXIST);
-        $record->action ?? 'add';
-        $record->timestart ?? 0;
-        $record->timeend ?? 0;
-        $record->timemodified ?? time();
+        $record->action = $record->action ?? 'add';
+        $record->timestart = $record->timestart ?? 0;
+        $record->timeend = $record->timeend ?? 0;
+        $record->timemodified = $record->timemodified ?? time();
         $groups = $record->groups ?? [];
         unset($record->groups);
         $insertid = $DB->insert_record('enrol_solaissits', $record);
@@ -76,8 +76,8 @@ class enrol_solaissits_generator extends component_generator_base {
         foreach ($groups as $key => $group) {
             $group = (object)(array)$group;
             $group->solaissitsid = $insertid;
-            $group->action ?? 'add';
-            $group->groupname ?? 'group' . $this->qicount;
+            $group->action = $group->action ?? 'add';
+            $group->groupname = $group->groupname ?? 'group' . $this->qicount;
             $ginsertid = $DB->insert_record('enrol_solaissits_groups', $group);
             $group->id = $ginsertid;
             $groups[$key] = $group;

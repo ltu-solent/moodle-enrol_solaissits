@@ -139,4 +139,29 @@ class helper {
         }
         return null;
     }
+
+    /**
+     * Gets (and creates if necessary) the enrol instance for solaissits
+     *
+     * @param stdClass $course
+     * @return stdClass
+     */
+    public static function get_enrol_instance($course) {
+        $enrol = enrol_get_plugin('solaissits');
+        $instance = null;
+        $enrolinstances = enrol_get_instances($course->id, true);
+        foreach ($enrolinstances as $courseenrolinstance) {
+            if ($courseenrolinstance->enrol == "solaissits") {
+                $instance = $courseenrolinstance;
+                break;
+            }
+        }
+        if (empty($instance)) {
+            // Create an instance if it doesn't exist, even though it might be deleted later.
+            $instanceid = $enrol->add_instance($course);
+            $instances = enrol_get_instances($course->id, true);
+            $instance = $instances[$instanceid];
+        }
+        return $instance;
+    }
 }

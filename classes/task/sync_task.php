@@ -53,7 +53,7 @@ class sync_task extends scheduled_task {
 
         // Instance of enrol_flatfile_plugin.
         $plugin = enrol_get_plugin('solaissits');
-        $result = $plugin->sync(new \null_progress_trace());
+        $result = $plugin->sync(new \text_progress_trace());
         return $result;
     }
 }

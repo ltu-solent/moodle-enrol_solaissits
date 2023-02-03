@@ -72,6 +72,45 @@ class enrol_solaissits_plugin extends enrol_plugin {
     }
 
     /**
+     * Does this plugin allow manual unenrolment of a specific user?
+     * Yes, but only if user suspended...
+     *
+     * @param stdClass $instance course enrol instance
+     * @param stdClass $ue record from user_enrolments table
+     *
+     * @return bool - true means user with 'enrol/xxx:unenrol' may unenrol this user,
+     * false means nobody may touch this user enrolment
+     */
+    public function allow_unenrol_user(stdClass $instance, stdClass $ue) {
+        if ($ue->status == ENROL_USER_SUSPENDED) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Does this plugin allow manual changes in user_enrolments table?
+     *
+     * All plugins allowing this must implement 'enrol/xxx:manage' capability
+     *
+     * @param stdClass $instance course enrol instance
+     * @return bool - true means it is possible to change enrol period and status in user_enrolments table
+     */
+    public function allow_manage(stdClass $instance) {
+        return true;
+    }
+
+    /**
+     * Does this plugin assign protected roles are can they be manually removed?
+     * @return bool - false means anybody may tweak roles, it does not use itemid and component when assigning roles
+     */
+    public function roles_protected() {
+        // Maybe add capability check here.
+        return true;
+    }
+
+    /**
      * External function tries to enrol user. If course not ready, this will queue the request.
      *
      * @param object $data
@@ -184,6 +223,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         // Do we want all enrolments to be deleted?
         $configuredaction = json_decode($this->get_config('roleactions_' . $data->roleid, $default));
         $pagetype = \enrol_solaissits\helper::get_customfield($data->courseid, 'pagetype');
+        // Page type should not be empty. But if it is, the user will simply be unenrolled.
         $action = $configuredaction->{$pagetype} ?? ENROL_EXT_REMOVED_UNENROL;
         if ($action == ENROL_EXT_REMOVED_KEEP) {
             return;
@@ -191,6 +231,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         // Loops through all enrolment methods, try to unenrol if roleid matches.
         $instances = $DB->get_records('enrol', array('courseid' => $data->courseid));
         $unenrolled = false;
+        // Not convinced we need to roll through all the instances.
         foreach ($instances as $instance) {
             if (!$ue = $DB->get_record('user_enrolments', ['enrolid' => $instance->id, 'userid' => $data->userid])) {
                 continue;
@@ -219,7 +260,6 @@ class enrol_solaissits_plugin extends enrol_plugin {
                     $componentroles[$ra->roleid] = $ra->roleid;
                 }
             }
-
             if ($componentroles && !isset($componentroles[$data->roleid])) {
                 // Do not unenrol using this method, user has some other protected role!
                 continue;
@@ -233,18 +273,9 @@ class enrol_solaissits_plugin extends enrol_plugin {
                     continue;
                 }
             }
-
             if ($action == ENROL_EXT_REMOVED_UNENROL) {
                 $unenrolled = true;
-                if (!$plugin->roles_protected()) {
-                    role_unassign_all([
-                        'contextid' => $coursecontext->id,
-                        'userid' => $data->userid,
-                        'roleid' => $data->roleid,
-                        'component' => '',
-                        'itemid' => 0],
-                    true);
-                }
+                // Unenrol should remove all roles.
                 $plugin->unenrol_user($instance, $data->userid);
                 if ($trace) {
                     $trace->output("User $data->userid was unenrolled from course $data->courseid (enrol_$instance->enrol)", 1);
@@ -252,28 +283,26 @@ class enrol_solaissits_plugin extends enrol_plugin {
 
             } else if ($action == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
                 if ($plugin->allow_manage($instance)) {
+                    $unenrolled = true;
                     if ($ue->status == ENROL_USER_ACTIVE) {
-                        $unenrolled = true;
                         $plugin->update_user_enrol($instance, $data->userid, ENROL_USER_SUSPENDED);
-                        if (!$plugin->roles_protected()) {
-                            role_unassign_all([
-                                'contextid' => $coursecontext->id,
-                                'userid' => $data->userid,
-                                'component' => 'enrol_' . $instance->enrol,
-                                'itemid' => $instance->id],
-                            true);
-                            role_unassign_all([
-                                'contextid' => $coursecontext->id,
-                                'userid' => $data->userid,
-                                'roleid' => $data->roleid,
-                                'component' => '',
-                                'itemid' => 0],
-                            true);
-                        }
-                        if ($trace) {
-                            $trace->output("User $data->userid enrolment was suspended in
-                                course $data->courseid (enrol_$instance->enrol)", 1);
-                        }
+                    }
+                    // Check if roles are protected?
+                    role_unassign_all([
+                        'contextid' => $coursecontext->id,
+                        'userid' => $data->userid,
+                        'component' => 'enrol_' . $instance->enrol,
+                        'itemid' => $instance->id],
+                    true);
+                    if ($trace) {
+                        $trace->output("User $data->userid enrolment was suspended in
+                            course $data->courseid (enrol_$instance->enrol)", 1);
+                    }
+                }
+            } else if ($action == ENROL_EXT_REMOVED_SUSPEND) {
+                if ($plugin->allow_manage($instance)) {
+                    if ($ue->status == ENROL_USER_ACTIVE) {
+                        $plugin->update_user_enrol($instance, $data->userid, ENROL_USER_SUSPENDED);
                     }
                 }
             }
@@ -316,6 +345,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
             $record->groupname = $group['name'];
             $DB->insert_record('enrol_solaissits_groups', $record);
         }
+        $data->groups = $groups;
     }
 
     /**
@@ -573,13 +603,14 @@ class enrol_solaissits_plugin extends enrol_plugin {
                     $status = ENROL_USER_SUSPENDED;
                 }
                 // If the user exists and the timestart, timeend or status is different, this automatically changes to an update.
-                $timestart = date('Y-m-d', $data->timestart);
-                $timeend = date('Y-m-d', $data->timeend);
-                $trace->output("{$data->action}, {$user->idnumber}, {$course->shortname},
-                    {$role->shortname}, {$timestart}-{$timeend}");
+                $timestart = ($data->timestart > 0) ? date('Y-m-d', $data->timestart) : '';
+                $timeend = ($data->timeend > 0) ? date('Y-m-d', $data->timeend) : '';
+                $trace->output("{$data->action}, {$user->idnumber}, {$course->shortname}," .
+                    " {$role->shortname}, {$timestart} - {$timeend}");
                 $this->enrol_user($instance, $data->userid, $data->roleid,
                         $data->timestart, $data->timeend, $status);
-                $this->process_groups($data->userid, $data->courseid, $data->groups);
+                $groups = $data->groups ?? [];
+                $this->process_groups($data->userid, $data->courseid, $groups);
             }
             $this->dequeue_enrolment($data->id);
         }

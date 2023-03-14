@@ -27,20 +27,20 @@ defined('MOODLE_INTERNAL') || die();
 
 $functions = [
     'enrol_solaissits_enrol_users' => array(
-        'classname'   => 'enrol_solaissits_external',
-        'methodname'  => 'enrol_users',
-        'classpath'   => 'enrol/solaissits/externallib.php',
+        'classname' => 'enrol_solaissits_external',
+        'methodname' => 'enrol_users',
+        'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Enrol users via the AIS-SITS interface',
         'capabilities' => 'enrol/solaissits:enrol',
-        'type'        => 'write',
+        'type' => 'write',
     ),
     'enrol_solaissits_unenrol_users' => array(
-        'classname'   => 'enrol_solaissits_external',
-        'methodname'  => 'unenrol_users',
-        'classpath'   => 'enrol/solaissits/externallib.php',
+        'classname' => 'enrol_solaissits_external',
+        'methodname' => 'unenrol_users',
+        'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Unenrol users via the AIS-SITS interface',
         'capabilities' => 'enrol/solaissits:unenrol',
-        'type'        => 'write',
+        'type' => 'write',
     ),
     'enrol_solaissits_get_enrolments' => [
         'classname' => 'enrol_solaissits_external',

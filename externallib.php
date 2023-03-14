@@ -406,14 +406,14 @@ class enrol_solaissits_external extends external_api {
                     'preferences' => new external_multiple_structure(
                         new external_single_structure(
                             [
-                                'name'  => new external_value(PARAM_RAW, 'The name of the preferences'),
+                                'name' => new external_value(PARAM_RAW, 'The name of the preferences'),
                                 'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
                             ]
                     ), 'User preferences', VALUE_OPTIONAL),
                     'enrolledcourses' => new external_multiple_structure(
                         new external_single_structure(
                             [
-                                'id'  => new external_value(PARAM_INT, 'Id of the course'),
+                                'id' => new external_value(PARAM_INT, 'Id of the course'),
                                 'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
                                 'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
                             ]
@@ -421,7 +421,7 @@ class enrol_solaissits_external extends external_api {
                 ]
             ),
             'course' => new external_single_structure([
-                'id'  => new external_value(PARAM_INT, 'Id of the course'),
+                'id' => new external_value(PARAM_INT, 'Id of the course'),
                 'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
                 'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
             ]),

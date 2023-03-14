@@ -293,7 +293,7 @@ class enrol_solaissits_external extends external_api {
     public static function get_enrolments_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'courseidnumber' => new external_value(PARAM_ALPHANUMEXT, 'Course idnumber'),
+                'courseidnumber' => new external_value(PARAM_RAW, 'Course idnumber'),
                 'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'User idnumber')
             ]
         );
@@ -342,7 +342,7 @@ class enrol_solaissits_external extends external_api {
      *
      * @return external_single_structure
      */
-    public function get_enrolments_returns(): external_single_structure {
+    public static function get_enrolments_returns(): external_single_structure {
         return new external_single_structure([
             'user' => new external_single_structure(
                 [

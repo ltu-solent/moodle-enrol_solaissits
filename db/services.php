@@ -41,5 +41,13 @@ $functions = [
         'description' => 'Unenrol users via the AIS-SITS interface',
         'capabilities' => 'enrol/solaissits:unenrol',
         'type'        => 'write',
-    )
+    ),
+    'enrol_solaissits_get_enrolments' => [
+        'classname' => 'enrol_solaissits_external',
+        'methodname' => 'get_enrolments',
+        'classpath' => 'enrol/solaissits/externallib.php',
+        'description' => 'Get enrolments for given user on given course',
+        'capabilities' => 'enrol/solaissits/enrol',
+        'type' => 'read'
+    ]
 ];

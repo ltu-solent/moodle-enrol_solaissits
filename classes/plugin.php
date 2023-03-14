@@ -461,7 +461,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         $enrolments = $DB->get_records_sql($sql, $params);
         foreach ($enrolments as $enrolment) {
             $roleassignments = $DB->get_records_sql(
-                "SELECT ra.id, ra.roleid, r.shortname
+                "SELECT ra.id, ra.roleid, r.shortname roleshortname
                 FROM {role_assignments} ra
                 JOIN {role} r ON r.id = ra.roleid
                 WHERE ra.contextid = :contextid

@@ -47,7 +47,7 @@ $functions = [
         'methodname' => 'get_enrolments',
         'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Get enrolments for given user on given course',
-        'capabilities' => 'enrol/solaissits/enrol',
+        'capabilities' => 'enrol/solaissits:enrol',
         'type' => 'read'
     ]
 ];

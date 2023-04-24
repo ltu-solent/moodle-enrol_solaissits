@@ -305,7 +305,7 @@ class plugin_test extends externallib_advanced_testcase {
     }
 
     /**
-     * Get queued items for given user on given course.
+     * Get queued items for given user on given course or all users on a given course.
      * @covers \enrol_solaissits_plugin::get_queued_items_for
      *
      * @return void
@@ -316,23 +316,87 @@ class plugin_test extends externallib_advanced_testcase {
         $enrol = enrol_get_plugin('solaissits');
         $studentrole = helper::get_role_by_shortname('student');
         $qigen = $this->getDataGenerator()->get_plugin_generator('enrol_solaissits');
-        $user = $this->getDataGenerator()->create_user();
-        $course = $this->getDataGenerator()->create_course();
-        $qi = $qigen->create_queued_item([
-            'courseid' => $course->id,
-            'userid' => $user->id,
-            'roleid' => $studentrole->id,
-            'groups' => [
-                [
-                    'name' => 'L4',
-                    'action' => 'add'
+        $courses = [];
+        $courses['course1']  = $this->getDataGenerator()->create_course(['shortname' => 'course1']);
+        $courses['course2']  = $this->getDataGenerator()->create_course(['shortname' => 'course2']);
+        $users = [];
+        $qis = ['course1' => [], 'course2' => []];
+        for ($x = 0; $x < 10; $x++) {
+            $users[$x] = $this->getDataGenerator()->create_user(['username' => 'username' . $x]);
+            $qis['course1'][$x] = $qigen->create_queued_item([
+                'courseid' => $courses['course1']->id,
+                'userid' => $users[$x]->id,
+                'roleid' => $studentrole->id,
+                'groups' => [
+                    [
+                        'name' => 'L4',
+                        'action' => 'add'
+                    ]
                 ]
-            ]
-        ]);
-        $result = $enrol->get_queued_items_for($user->id, $course->id);
+            ]);
+            $qis['course2'][$x] = $qigen->create_queued_item([
+                'courseid' => $courses['course2']->id,
+                'userid' => $users[$x]->id,
+                'roleid' => $studentrole->id,
+                'groups' => [
+                    [
+                        'name' => 'L4',
+                        'action' => 'add'
+                    ]
+                ]
+            ]);
+        }
+
+        $result = $enrol->get_queued_items_for($users[0]->id, $courses['course1']->id);
         $this->assertCount(1, $result);
         $item = reset($result);
-        $this->assertEquals($qi->id, $item->id);
+        $this->assertEquals($qis['course1'][0]->id, $item->id);
+        // Can now pass in nothing, but get nothing in return.
+        $result = $enrol->get_queued_items_for();
+        $this->assertEmpty($result);
+
+        // Get queued items for specified user.
+        $result = $enrol->get_queued_items_for($users[0]->id);
+        $this->assertCount(2, $result);
+        $courseuser0 = $qis['course1'][0];
+        $matches = array_filter($result, function($item) use ($courseuser0) {
+            return $item->id == $courseuser0->id;
+        });
+        $this->assertCount(1, $matches);
+        $match = reset($matches);
+        $this->assertEquals($courseuser0->userid, $match->userid);
+        $this->assertEquals($courseuser0->courseid, $match->courseid);
+        $this->assertEquals($courseuser0->roleid, $match->roleid);
+        $this->assertEquals($courseuser0->action, $match->action);
+        $this->assertEquals($courseuser0->id, $match->id);
+
+        $courseuser0 = $qis['course2'][0];
+        $matches = array_filter($result, function($item) use ($courseuser0) {
+            return $item->id == $courseuser0->id;
+        });
+        $this->assertCount(1, $matches);
+        $match = reset($matches);
+        $this->assertEquals($courseuser0->userid, $match->userid);
+        $this->assertEquals($courseuser0->courseid, $match->courseid);
+        $this->assertEquals($courseuser0->roleid, $match->roleid);
+        $this->assertEquals($courseuser0->action, $match->action);
+        $this->assertEquals($courseuser0->id, $match->id);
+
+        // Get queued items for specified course.
+        $result = $enrol->get_queued_items_for(0, $courses['course1']->id);
+        $this->assertCount(10, $result);
+        for ($x = 0; $x < 10; $x++) {
+            $user = $users[$x];
+            $matches = array_filter($result, function($item) use ($user) {
+                return $user->id == $item->userid;
+            });
+            $this->assertCount(1, $matches);
+            $match = reset($matches);
+            $this->assertEquals($qis['course1'][$x]->userid, $match->userid);
+            $this->assertEquals($qis['course1'][$x]->courseid, $match->courseid);
+            $this->assertEquals($qis['course1'][$x]->roleid, $match->roleid);
+            $this->assertEquals($qis['course1'][$x]->action, $match->action);
+        }
     }
 
     /**

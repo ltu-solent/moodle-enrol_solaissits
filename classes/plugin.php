@@ -410,15 +410,25 @@ class enrol_solaissits_plugin extends enrol_plugin {
     }
 
     /**
-     * Get any queued enrolments for given user and course
+     * Get any queued enrolments for given user or course or both
      *
      * @param int $userid
      * @param int $courseid
      * @return array List of enrolment records
      */
-    public function get_queued_items_for($userid, $courseid) {
+    public function get_queued_items_for($userid = 0, $courseid = 0) {
         global $DB;
-        $items = $DB->get_records('enrol_solaissits', ['userid' => $userid, 'courseid' => $courseid]);
+        if ($userid == 0 && $courseid == 0) {
+            return [];
+        }
+        $params = [];
+        if ($userid > 0) {
+            $params['userid'] = $userid;
+        }
+        if ($courseid > 0) {
+            $params['courseid'] = $courseid;
+        }
+        $items = $DB->get_records('enrol_solaissits', $params);
         foreach ($items as $key => $item) {
             $items[$key]->groups = [];
             $groupactions = $DB->get_records('enrol_solaissits_groups', ['solaissitsid' => $item->id]);

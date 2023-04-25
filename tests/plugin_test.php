@@ -322,7 +322,7 @@ class plugin_test extends externallib_advanced_testcase {
         $users = [];
         $qis = ['course1' => [], 'course2' => []];
         for ($x = 0; $x < 10; $x++) {
-            $users[$x] = $this->getDataGenerator()->create_user(['username' => 'username' . $x]);
+            $users[$x] = $this->getDataGenerator()->create_user(['username' => 'username' . $x, 'idnumber' => 'Student' . $x]);
             $qis['course1'][$x] = $qigen->create_queued_item([
                 'courseid' => $courses['course1']->id,
                 'userid' => $users[$x]->id,
@@ -365,8 +365,10 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertCount(1, $matches);
         $match = reset($matches);
         $this->assertEquals($courseuser0->userid, $match->userid);
+        $this->assertEquals($users[0]->idnumber, $match->useridnumber);
         $this->assertEquals($courseuser0->courseid, $match->courseid);
         $this->assertEquals($courseuser0->roleid, $match->roleid);
+        $this->assertEquals($studentrole->shortname, $match->roleshortname);
         $this->assertEquals($courseuser0->action, $match->action);
         $this->assertEquals($courseuser0->id, $match->id);
 
@@ -377,8 +379,10 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertCount(1, $matches);
         $match = reset($matches);
         $this->assertEquals($courseuser0->userid, $match->userid);
+        $this->assertEquals($users[0]->idnumber, $match->useridnumber);
         $this->assertEquals($courseuser0->courseid, $match->courseid);
         $this->assertEquals($courseuser0->roleid, $match->roleid);
+        $this->assertEquals($studentrole->shortname, $match->roleshortname);
         $this->assertEquals($courseuser0->action, $match->action);
         $this->assertEquals($courseuser0->id, $match->id);
 

@@ -461,4 +461,117 @@ class enrol_solaissits_external extends external_api {
             )
         ]);
     }
+
+    /**
+     * Get course enrolment parameters
+     *
+     * @return external_function_parameters
+     */
+    public static function get_course_enrolments_parameters(): external_function_parameters {
+        return new external_function_parameters(
+            [
+                'courseidnumber' => new external_value(PARAM_RAW, 'Course idnumber')
+            ]
+        );
+
+    }
+
+    /**
+     * Get course enrolments
+     *
+     * @param string $courseidnumber
+     * @return object
+     */
+    public static function get_course_enrolments($courseidnumber) {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/course/lib.php');
+        $params = self::validate_parameters(
+            self::get_course_enrolments_parameters(),
+            [
+                'courseidnumber' => $courseidnumber
+            ]
+        );
+        $course = $DB->get_record('course', ['idnumber' => $courseidnumber], '*', MUST_EXIST);
+        $coursecontext = context_course::instance($course->id, IGNORE_MISSING);
+        try {
+            self::validate_context($coursecontext);
+        } catch (Exception $e) {
+            $exceptionparam = new stdClass();
+            $exceptionparam->message = $e->getMessage();
+            $exceptionparam->courseidnumber = $params['courseidnumber'];
+            throw new moodle_exception('errorcoursecontextnotvalid' , 'webservice', '', $exceptionparam);
+        }
+        course_require_view_participants($coursecontext);
+        $enrol = enrol_get_plugin('solaissits');
+        if (empty($enrol)) {
+            throw new moodle_exception('pluginnotinstalled', 'enrol_solaissits');
+        }
+
+        $return = new stdClass();
+        $return->course = (object)[
+            'id' => $course->id,
+            'fullname' => $course->fullname,
+            'shortname' => $course->shortname,
+            'idnumber' => $course->idnumber
+        ];
+        $return->enrolments = $enrol->get_course_enrolments($course->id);
+        $return->queueditems = $enrol->get_queued_items_for(0, $course->id);
+        return $return;
+
+    }
+
+    /**
+     * Return structure of get_course_enrolments
+     *
+     * @return external_single_structure
+     */
+    public static function get_course_enrolments_returns(): external_single_structure {
+        return new external_single_structure([
+            'course' => new external_single_structure([
+                'id' => new external_value(PARAM_INT, 'Id of the course'),
+                'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
+                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
+            ]),
+            'enrolments' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Id of the user enrolment'),
+                    'status' => new external_value(PARAM_INT, 'Enrolment status. 0=active, 1=suspended'),
+                    'enrolid' => new external_value(PARAM_INT, 'Id of the enrolment instance'),
+                    'timestart' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment begins'),
+                    'timeend' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment begins'),
+                    'userid' => new external_value(PARAM_INT, 'Userid'),
+                    'useridnumber' => new external_value(PARAM_RAW,
+                        'An arbitrary ID code number perhaps from the institution', VALUE_OPTIONAL),
+                    'roles' => new external_multiple_structure(
+                        new external_single_structure([
+                            'id' => new external_value(PARAM_INT, 'Role assignment id'),
+                            'roleid' => new external_value(PARAM_INT, 'Role id'),
+                            'shortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname')
+                        ])
+                    )
+                ])
+            ),
+            'queueditems' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Id of queued item'),
+                    'action' => new external_value(PARAM_ALPHANUMEXT, 'Enrolment action - add, remove, suspend'),
+                    'roleid' => new external_value(PARAM_INT, 'Role id'),
+                    'roleshortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
+                    'userid' => new external_value(PARAM_INT, 'User id'),
+                    'useridnumber' => new external_value(PARAM_RAW,
+                        'An arbitrary ID code number perhaps from the institution', VALUE_OPTIONAL),
+                    'courseid' => new external_value(PARAM_INT, 'Course id'),
+                    'timestart' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment begins'),
+                    'timeend' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment ends'),
+                    'groups' => new external_multiple_structure(
+                        new external_single_structure([
+                            'id' => new external_value(PARAM_INT, 'Id of queued group item'),
+                            'action' => new external_value(PARAM_ALPHANUMEXT, 'Action - add, del'),
+                            'name' => new external_value(PARAM_RAW, 'Name of group to be assigned to this user.')
+                        ])
+                    )
+                ])
+            )
+        ]);
+    }
 }

@@ -111,6 +111,16 @@ class enrol_solaissits_plugin extends enrol_plugin {
     }
 
     /**
+     * Is it possible to hide/show enrol instance via standard UI?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance) {
+        return false;
+    }
+
+    /**
      * External function tries to enrol user. If course not ready, this will queue the request.
      *
      * @param object $data

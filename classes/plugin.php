@@ -443,6 +443,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
             $groupactions = $DB->get_records('enrol_solaissits_groups', ['solaissitsid' => $item->id]);
             foreach ($groupactions as $groupaction) {
                 $items[$key]->groups[] = [
+                    'id' => $groupaction->id,
                     'name' => $groupaction->groupname,
                     'action' => $groupaction->action
                 ];
@@ -577,6 +578,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 $groupactions = $DB->get_records('enrol_solaissits_groups', ['solaissitsid' => $item->id]);
                 foreach ($groupactions as $groupaction) {
                     $item->groups[] = [
+                        'id' => $groupaction->id,
                         'name' => $groupaction->groupname,
                         'action' => $groupaction->action
                     ];

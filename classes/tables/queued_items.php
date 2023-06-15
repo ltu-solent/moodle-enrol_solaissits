@@ -29,6 +29,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/lib/tablelib.php');
 
+use context_course;
+use enrol_solaissits\helper;
 use html_writer;
 use moodle_url;
 use table_sql;
@@ -51,6 +53,7 @@ class queued_items extends table_sql {
             'action',
             'role',
             'fullname',
+            'idnumber',
             'course',
             'timestart',
             'timeend',
@@ -63,6 +66,7 @@ class queued_items extends table_sql {
             get_string('action'),
             get_string('role'),
             get_string('fullname'),
+            get_string('idnumber'),
             get_string('course'),
             get_string('timestart', 'enrol_solaissits'),
             get_string('timeend', 'enrol_solaissits'),
@@ -71,6 +75,11 @@ class queued_items extends table_sql {
         ];
         $this->define_headers($headers);
         $this->collapsible(false);
+        $this->no_sorting('groups');
+        $this->no_sorting('timestart');
+        $this->no_sorting('timeend');
+        $this->no_sorting('role');
+        $this->no_sorting('action');
         $this->define_baseurl(new moodle_url("/enrol/solaissits/queueditems.php"));
         // phpcs:disable
         // $userfieldsapi = \core_user\fields::for_identity(context_system::instance(), false)->with_userpic();
@@ -78,12 +87,39 @@ class queued_items extends table_sql {
         // phpcs:enable
         // Manually specify userfields as the \core_user\fields API isn't available in M3.9, but switch on when running M4.
         $userfields = ' u.firstname, u.lastname, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename ';
-        $fields = 's.id, s.action, s.roleid, s.userid, s.courseid, s.timestart, s.timeend, s.timemodified, ' . $userfields;
+        $fields = 's.id, s.action, s.roleid, s.userid, s.courseid, c.shortname course, s.timestart, s.timeend, s.timemodified, ' .
+            ' u.idnumber, ' . $userfields;
         $from = "{enrol_solaissits} s
-        JOIN {user} u ON u.id = s.userid";
+        JOIN {user} u ON u.id = s.userid
+        LEFT JOIN {course} c ON c.id = s.courseid";
         $where = '1=1';
         $this->set_sql($fields, $from, $where);
         $this->showdownloadbuttonsat = [TABLE_P_BOTTOM];
+    }
+
+    /**
+     * Display action
+     *
+     * @param object $row
+     * @return string HTML for cell
+     */
+    protected function col_action($row) {
+        global $DB;
+        // If this user is not already enrolled, or has no prior queued item, change this to add.
+        $context = context_course::instance($row->courseid, IGNORE_MISSING);
+        if (!$context) {
+            return get_string($row->action, 'enrol_solaissits');
+        }
+        if ($row->action == 'unsuspend') {
+            if (!is_enrolled($context, $row->userid)) {
+                return get_string('add', 'enrol_solaissits');
+            }
+            if (!$DB->record_exists_select('enrol_solaissits', "id < :id AND userid = :userid AND courseid = :courseid",
+                    ['id' => $row->id, 'userid' => $row->userid, 'courseid' => $row->courseid])) {
+                return get_string('add', 'enrol_solaissits');
+            }
+        }
+        return get_string($row->action, 'enrol_solaissits');
     }
 
     /**
@@ -117,10 +153,24 @@ class queued_items extends table_sql {
         if ($this->is_downloading()) {
             return $course->shortname;
         }
-        return html_writer::link(
+
+        $html = html_writer::link(
             new moodle_url('/course/view.php', ['id' => $course->id]),
             $course->shortname
         );
+        $extra = [];
+        if (!$course->visible) {
+            $extra[] = get_string('notvisible', 'enrol_solaissits');
+        }
+
+        if (!helper::istemplated($row->courseid)) {
+            $extra[] = get_string('nottemplated', 'enrol_solaissits');
+        }
+
+        if ($extra) {
+            $html .= '<br /><small>' . join(' - ', $extra) . '</small>';
+        }
+        return $html;
     }
 
     /**
@@ -160,7 +210,7 @@ class queued_items extends table_sql {
         $groups = $DB->get_records('enrol_solaissits_groups', ['solaissitsid' => $row->id]);
         $lines = [];
         foreach ($groups as $group) {
-            $lines[] = $group->action . ': ' . $group->groupname;
+            $lines[] = get_string($group->action, 'enrol_solaissits') . ': ' . $group->groupname;
         }
         // Make this into a link if there are groups.
         return html_writer::alist($lines);

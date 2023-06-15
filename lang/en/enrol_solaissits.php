@@ -25,9 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['add'] = 'Add';
+
 $string['component'] = 'SOL AIS-SITS';
 $string['course'] = 'Course';
 $string['coursedoesntexist'] = 'Course doesn\'t exist: {$a}';
+
+$string['del'] = 'Delete';
 
 $string['enrolsync'] = 'Enrolment sync task';
 
@@ -35,6 +39,9 @@ $string['id'] = 'ID';
 $string['invalidtimestartendvalues'] = 'Invalid timestart ({$a->timestart}) and timeend ({$a->timeend}) values';
 
 $string['module'] = 'Module';
+
+$string['nottemplated'] = 'Not templated';
+$string['notvisible'] = 'Not visible';
 
 $string['pluginname'] = 'Solent AIS-SITS';
 $string['pluginname_desc'] = 'An enrolment method for managing enrolments from Solent\'s AIS-SITS interface.';
@@ -52,11 +59,13 @@ $string['solaissits:config'] = 'Configure enrolment on payment enrol instances';
 $string['solaissits:enrol'] = 'Enrol users on course';
 $string['solaissits:manage'] = 'Manage enrolled users';
 $string['solaissits:unenrol'] = 'Unenrol users from course';
+$string['suspend'] = 'Suspend';
 
 $string['timeend'] = 'Enrolment ends';
 $string['timemodified'] = 'Last modified';
 $string['timestart'] = 'Enrolment begins';
 
+$string['unsuspend'] = 'Unsuspend';
 $string['userdoesntexist'] = 'User doesn\'t exist: {$a}';
 
 $string['wscannotenrol'] = 'Plugin instance cannot enrol a user in the course id = {$a->courseid}';

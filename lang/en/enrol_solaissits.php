@@ -27,13 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['add'] = 'Add';
 
-$string['component'] = 'SOL AIS-SITS';
+$string['component'] = 'SITS enrolments';
 $string['course'] = 'Course';
 $string['coursedoesntexist'] = 'Course doesn\'t exist: {$a}';
 
 $string['del'] = 'Delete';
 
-$string['enrolsync'] = 'Enrolment sync task';
+$string['enrolsync'] = 'SITS enrolment sync task';
 
 $string['id'] = 'ID';
 $string['invalidtimestartendvalues'] = 'Invalid timestart ({$a->timestart}) and timeend ({$a->timeend}) values';
@@ -43,7 +43,7 @@ $string['module'] = 'Module';
 $string['nottemplated'] = 'Not templated';
 $string['notvisible'] = 'Not visible';
 
-$string['pluginname'] = 'Solent AIS-SITS';
+$string['pluginname'] = 'SITS enrolments';
 $string['pluginname_desc'] = 'An enrolment method for managing enrolments from Solent\'s AIS-SITS interface.';
 $string['pluginnotinstalled'] = 'Plugin not installed';
 

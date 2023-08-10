@@ -612,11 +612,13 @@ class enrol_solaissits_plugin extends enrol_plugin {
 
         $processed = $this->process_queued_items($trace) || $processed;
 
+        $processed = $this->process_deleted_courses($trace) || $processed;
+        $trace->finished();
         return true;
     }
 
     /**
-     * Process an individual queued item
+     * Process each queued item
      *
      * @param progress_trace $trace
      * @return boolean
@@ -632,13 +634,17 @@ class enrol_solaissits_plugin extends enrol_plugin {
         $itemcount = count($queueditems);
         if ($itemcount == 0) {
             $trace->output("No items found to process.");
-            $trace->finished();
             return false;
         }
         $trace->output($itemcount . " enrolment items found to process.");
         foreach ($queueditems as $data) {
             $course = $DB->get_record('course', ['id' => $data->courseid]);
-            $user = $DB->get_record('user', ['id' => $data->userid]);
+            $user = $DB->get_record('user', ['id' => $data->userid, 'deleted' => 0]);
+            if (!$user) {
+                $trace->output("User id {$data->userid} does not exist. Enrolment item removed for course id {$data->courseid}.");
+                $this->dequeue_enrolment($data->id);
+                continue;
+            }
             $role = $DB->get_record('role', ['id' => $data->roleid]);
             // We only actually enrol when a course has had its template applied.
             // Otherwise the enrolment will be deleted when the template is applied.
@@ -685,7 +691,27 @@ class enrol_solaissits_plugin extends enrol_plugin {
             }
             $this->dequeue_enrolment($data->id);
         }
-        $trace->finished();
+        return true;
+    }
+
+    /**
+     * Dequeue any entries for deleted courses
+     *
+     * @param progress_trace $trace
+     * @return boolean
+     */
+    private function process_deleted_courses(progress_trace $trace): bool {
+        global $DB;
+        // Get list of queued items where the courseid does not exist in the course table.
+        // Dequeue those items.
+        $deletedcourseitems = $DB->get_records_sql("SELECT sas.id, sas.courseid, sas.userid
+            FROM {enrol_solaissits} sas
+            LEFT JOIN {course} c ON c.id = sas.courseid
+            WHERE c.id IS NULL");
+        foreach ($deletedcourseitems as $item) {
+            $trace->output("Course id {$item->courseid} not found. Enrolment item for user id {$item->userid} has been removed");
+            $this->dequeue_enrolment($item->id);
+        }
         return true;
     }
 

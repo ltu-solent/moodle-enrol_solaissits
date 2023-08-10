@@ -415,6 +415,7 @@ class plugin_test extends externallib_advanced_testcase {
         $this->setup_enrol();
         $enrol = enrol_get_plugin('solaissits');
         $customfields = $this->setup_customfields();
+        $expectedstring = '';
 
         $module1 = $this->getDataGenerator()->create_course();
         $module1context = context_course::instance($module1->id);
@@ -443,12 +444,23 @@ class plugin_test extends externallib_advanced_testcase {
             'templateapplied' => 1
         ], $customfields);
 
+        // This course is going to be deleted before any enrolments have been processed.
+        $course3 = $this->getDataGenerator()->create_course();
+        $this->set_customfields($course3->id, [
+            'pagetype' => 'course',
+            'templateapplied' => 0
+        ], $customfields);
+
         $student1 = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);
         $student2 = $this->getDataGenerator()->create_user(['idnumber' => 'Student2']);
+        // Deleted user.
+        $student3 = $this->getDataGenerator()->create_user(['idnumber' => 'Student3']);
+        // Suspended user account.
+        $student4 = $this->getDataGenerator()->create_user(['idnumber' => 'Student3']);
         $studentrole = helper::get_role_by_shortname('student');
 
-        $trace = new text_progress_trace();
-        $enrol->sync($trace);
+        $enrol->sync(new text_progress_trace());
+        $expectedstring .= "No items found to process.\n";
 
         $qigen = $this->getDataGenerator()->get_plugin_generator('enrol_solaissits');
         $qigen->create_queued_item([
@@ -484,6 +496,17 @@ class plugin_test extends externallib_advanced_testcase {
             'courseid' => $course2->id,
             'roleid' => $studentrole->id
         ]);
+        // Put student3 (which will be deleted) before student2 to ensure processing continues.
+        $qigen->create_queued_item([
+            'userid' => $student3->id,
+            'courseid' => $module1->id,
+            'roleid' => $studentrole->id
+        ]);
+        $qigen->create_queued_item([
+            'userid' => $student4->id,
+            'courseid' => $module1->id,
+            'roleid' => $studentrole->id
+        ]);
         $qigen->create_queued_item([
             'userid' => $student2->id,
             'courseid' => $module1->id,
@@ -504,12 +527,33 @@ class plugin_test extends externallib_advanced_testcase {
             'courseid' => $course2->id,
             'roleid' => $studentrole->id
         ]);
-        // 9 Queued items before sync begins.
-        $this->assertCount(9, $DB->get_records('enrol_solaissits'));
+        $qigen->create_queued_item([
+            'userid' => $student1->id,
+            'courseid' => $course3->id,
+            'roleid' => $studentrole->id,
+            'groups' => [
+                ['action' => 'add', 'groupname' => 'L5']
+            ]
+        ]);
+        $qigen->create_queued_item([
+            'userid' => $student2->id,
+            'courseid' => $course3->id,
+            'roleid' => $studentrole->id,
+            'groups' => [
+                ['action' => 'add', 'groupname' => 'L4']
+            ]
+        ]);
+        // 13 Queued items before sync begins.
+        $this->assertCount(13, $DB->get_records('enrol_solaissits'));
 
         // Module 2 and Course 2 both have template applied, so all their queued items are processed (4).
-        $enrol->sync(new null_progress_trace());
-        $this->assertCount(5, $DB->get_records('enrol_solaissits'));
+        $enrol->sync(new text_progress_trace());
+        $expectedstring .= "4 enrolment items found to process.\n" .
+            "add, Student1, tc_2, student,  - \n" .
+            "add, Student2, tc_2, student,  - \n" .
+            "add, Student1, tc_4, student,  - \n" .
+            "add, Student2, tc_4, student,  - \n";
+        $this->assertCount(9, $DB->get_records('enrol_solaissits'));
         $this->assertTrue(is_enrolled($module2context, $student1));
         $this->assertTrue(is_enrolled($module2context, $student2));
         $this->assertTrue(is_enrolled($course2context, $student1));
@@ -520,21 +564,39 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertFalse(is_enrolled($course1context, $student1));
         $this->assertFalse(is_enrolled($course1context, $student2));
 
+        // Before the module 1 template has been applied, delete student3.
+        user_delete_user($student3);
+        // And suspend student4 - enrolment will happen.
+        $student4->suspended = 1;
+        user_update_user($student4, false);
+
         // Module 1 now has template applied, so all their queued items are processed (2).
         $this->set_customfields($module1->id, ['templateapplied' => 1], $customfields);
-        $enrol->sync(new null_progress_trace());
-        $this->assertCount(3, $DB->get_records('enrol_solaissits'));
+        $enrol->sync(new text_progress_trace());
+        $expectedstring .= "4 enrolment items found to process.\n" .
+            "add, Student1, tc_1, student,  - \n" .
+            "User id " . $student3->id . " does not exist. Enrolment item removed for course id " . $module1->id .".\n" .
+            "add, Student3, tc_1, student,  - \n" .
+            "add, Student2, tc_1, student,  - \n";
+        $this->assertCount(5, $DB->get_records('enrol_solaissits'));
         $this->assertTrue(is_enrolled($module1context, $student1));
         $this->assertTrue(is_enrolled($module1context, $student2));
+        $this->assertTrue(is_enrolled($module1context, $student4));
+        $this->assertFalse(is_enrolled($module1context, $student3));
 
         // Nothing has changed so there's nothing more to process.
         $enrol->sync(new text_progress_trace());
-
+        $expectedstring .= "No items found to process.\n";
         // Course 2 now has template applied (3).
         // This is a little hacky, but is required because the field already has a value set.
         $course1custom['templateapplied']->set('value', 1)->set('charvalue', 1)->save();
-        $enrol->sync(new null_progress_trace());
-        $this->assertCount(0, $DB->get_records('enrol_solaissits'));
+        $enrol->sync(new text_progress_trace());
+        $expectedstring .= "3 enrolment items found to process.\n" .
+            "add, Student1, tc_3, student,  - \n" .
+            "add, Student1, tc_3, student,  - \n" .
+            "add, Student2, tc_3, student,  - \n";
+
+        $this->assertCount(2, $DB->get_records('enrol_solaissits'));
         $this->assertTrue(is_enrolled($course1context, $student1));
         $this->assertTrue(is_enrolled($course1context, $student2));
         // There are groups in course 2.
@@ -550,6 +612,16 @@ class plugin_test extends externallib_advanced_testcase {
                 $this->assertFalse(groups_is_member($group->id, $student2->id));
             }
         }
-        $this->expectOutputString("No items found to process.\nNo items found to process.\n");
+        // Delete course3 before the enrolments can be actioned.
+        delete_course($course3, false);
+        // Next time the enrol_sync runs, it will check if any courses have been deleted, and dequeue items for those courses.
+        $enrol->sync(new text_progress_trace());
+        $expectedstring .= "No items found to process.\n" .
+            "Course id " . $course3->id . " not found. Enrolment item for user id " . $student1->id . " has been removed\n" .
+            "Course id " . $course3->id . " not found. Enrolment item for user id " . $student2->id . " has been removed\n";
+        $this->assertCount(0, $DB->get_records('enrol_solaissits'));
+        $this->assertCount(0, $DB->get_records('enrol_solaissits_groups'));
+
+        $this->expectOutputString($expectedstring);
     }
 }

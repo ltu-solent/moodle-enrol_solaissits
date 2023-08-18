@@ -128,6 +128,21 @@ class enrol_solaissits_plugin extends enrol_plugin {
      */
     public function external_enrol_user($data) {
         global $DB;
+        // Validate data and set sensible defaults if missing values.
+        if (!isset($data->courseid)) {
+            throw new moodle_exception('missingcourseid', 'enrol_solaissits');
+        }
+        if (!isset($data->roleid)) {
+            throw new moodle_exception('missingroleid', 'enrol_solaissits');
+        }
+        if (!isset($data->userid)) {
+            throw new moodle_exception('missinguserid', 'enrol_solaissits');
+        }
+        $data->action = $data->action ?? 'add';
+        $data->timestart = $data->timestart ?? 0;
+        $data->timeend = $data->timeend ?? 0;
+        $data->groups = $data->groups ?? [];
+
         $course = $DB->get_record('course', ['id' => $data->courseid]);
         // Check enrolment plugin instance is enabled/exists.
         $instance = null;
@@ -178,6 +193,15 @@ class enrol_solaissits_plugin extends enrol_plugin {
      */
     public function external_unenrol_user($data) {
         global $DB;
+        if (!isset($data->courseid)) {
+            throw new moodle_exception('missingcourseid', 'enrol_solaissits');
+        }
+        if (!isset($data->roleid)) {
+            throw new moodle_exception('missingroleid', 'enrol_solaissits');
+        }
+        if (!isset($data->userid)) {
+            throw new moodle_exception('missinguserid', 'enrol_solaissits');
+        }
         $course = $DB->get_record('course', ['id' => $data->courseid]);
         // Check enrolment plugin instance is enabled/exists.
         $instance = null;
@@ -217,6 +241,15 @@ class enrol_solaissits_plugin extends enrol_plugin {
      */
     private function process_unenrol($data, $trace = null) {
         global $DB;
+        if (!isset($data->courseid)) {
+            throw new moodle_exception('missingcourseid', 'enrol_solaissits');
+        }
+        if (!isset($data->roleid)) {
+            throw new moodle_exception('missingroleid', 'enrol_solaissits');
+        }
+        if (!isset($data->userid)) {
+            throw new moodle_exception('missinguserid', 'enrol_solaissits');
+        }
         $coursecontext = context_course::instance($data->courseid);
         $default = json_encode([
             'course' => ENROL_EXT_REMOVED_UNENROL,

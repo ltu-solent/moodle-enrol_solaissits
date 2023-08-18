@@ -38,6 +38,9 @@ $string['enrolsync'] = 'SITS enrolment sync task';
 $string['id'] = 'ID';
 $string['invalidtimestartendvalues'] = 'Invalid timestart ({$a->timestart}) and timeend ({$a->timeend}) values';
 
+$string['missingcourseid'] = 'Courseid not provided';
+$string['missingroleid'] = 'Roleid not provided';
+$string['missinguserid'] = 'Userid not provided';
 $string['module'] = 'Module';
 
 $string['nottemplated'] = 'Not templated';

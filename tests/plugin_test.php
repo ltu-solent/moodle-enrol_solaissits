@@ -284,6 +284,16 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertEquals(ENROL_USER_SUSPENDED, $enrolments->enrolments[0]->status);
         $this->assertCount(0, $enrolments->enrolments[0]->roles);
 
+        // We want to test when a user has changed courses where some of the modules are in the new course.
+        // This means we will get an unenrol signal for a module (which will suspend the student),
+        // then get a new enrol signal (rather than an update). Under the hood, this should convert
+        // to an update.
+        $enrol->external_enrol_user($data);
+        $enrolments = $enrol->get_enrolments_for($student->id, $module->id);
+        $this->assertCount(1, $enrolments->enrolments);
+        $this->assertEquals(ENROL_USER_ACTIVE, $enrolments->enrolments[0]->status);
+        $this->assertCount(1, $enrolments->enrolments[0]->roles);
+
         // Unit leaders will be completely unenrolled from Modules, but nothing happens on Courses.
         $data = new stdClass();
         $data->userid = $teacher->id;

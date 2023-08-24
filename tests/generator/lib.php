@@ -46,7 +46,7 @@ class enrol_solaissits_generator extends component_generator_base {
     /**
      * Create a queued item record. Requires roleid, courseid, and userid as a minimum.
      *
-     * @param stdClass $record
+     * @param mixed $record
      * @return stdClass
      */
     public function create_queued_item($record) {
@@ -56,15 +56,15 @@ class enrol_solaissits_generator extends component_generator_base {
         if (!isset($record->roleid)) {
             throw new moodle_exception('roleidnotset', 'enrol_solaissits');
         }
-        $role = $DB->record_exists('role', ['id' => $record->roleid], MUST_EXIST);
+        $DB->record_exists('role', ['id' => $record->roleid], MUST_EXIST);
         if (!isset($record->courseid)) {
             throw new moodle_exception('courseidnotset', 'enrol_solaissits');
         }
-        $course = $DB->record_exists('course', ['id' => $record->courseid], MUST_EXIST);
+        $DB->record_exists('course', ['id' => $record->courseid], MUST_EXIST);
         if (!isset($record->userid)) {
             throw new moodle_exception('useridnotset', 'enrol_solaissits');
         }
-        $user = $DB->record_exists('user', ['id' => $record->userid], MUST_EXIST);
+        $DB->record_exists('user', ['id' => $record->userid], MUST_EXIST);
         $record->action = $record->action ?? 'add';
         $record->timestart = $record->timestart ?? 0;
         $record->timeend = $record->timeend ?? 0;

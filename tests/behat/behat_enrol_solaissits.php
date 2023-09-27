@@ -63,7 +63,7 @@ class behat_enrol_solaissits extends behat_base {
             $user = $DB->get_record('user', ['username' => $enrolment['username']], '*', MUST_EXIST);
             $enrolment['userid'] = $user->id;
             unset($enrolment['username']);
-
+            /** @var \enrol_solaissits_generator $ssdg */
             $ssdg = behat_util::get_data_generator()->get_plugin_generator('enrol_solaissits');
             $ssdg->create_queued_item($enrolment);
         }

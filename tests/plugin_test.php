@@ -55,6 +55,7 @@ class plugin_test extends externallib_advanced_testcase {
     public function test_get_enrolments_for() {
         global $DB;
         $this->resetAfterTest();
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         $this->enable_plugin();
         $studentrole = $DB->get_record('role', ['shortname' => 'student']);
@@ -62,6 +63,7 @@ class plugin_test extends externallib_advanced_testcase {
         $this->setAdminUser();
         $user = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
+        /** @var \enrol_solaissits_generator $solgen */
         $solgen = $this->getDataGenerator()->get_plugin_generator('enrol_solaissits');
         $qi = $solgen->create_queued_item([
             'roleid' => $studentrole->id,
@@ -96,6 +98,7 @@ class plugin_test extends externallib_advanced_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->enable_plugin();
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         $customfields = $this->setup_customfields();
 
@@ -199,6 +202,7 @@ class plugin_test extends externallib_advanced_testcase {
     public function test_external_unenrol_user() {
         $this->resetAfterTest();
         $this->setup_enrol();
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         $customfields = $this->setup_customfields();
         $studentrole = helper::get_role_by_shortname('student');
@@ -323,8 +327,10 @@ class plugin_test extends externallib_advanced_testcase {
     public function test_get_queued_items_for() {
         $this->resetAfterTest();
         $this->enable_plugin();
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         $studentrole = helper::get_role_by_shortname('student');
+        /** @var \enrol_solaissits_generator $qigen */
         $qigen = $this->getDataGenerator()->get_plugin_generator('enrol_solaissits');
         $courses = [];
         $courses['course1']  = $this->getDataGenerator()->create_course(['shortname' => 'course1']);
@@ -423,6 +429,7 @@ class plugin_test extends externallib_advanced_testcase {
         global $DB;
         $this->resetAfterTest();
         $this->setup_enrol();
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         $customfields = $this->setup_customfields();
         $expectedstring = '';
@@ -471,7 +478,7 @@ class plugin_test extends externallib_advanced_testcase {
 
         $enrol->sync(new text_progress_trace());
         $expectedstring .= "No items found to process.\n";
-
+        /** @var \enrol_solaissits_generator $qigen */
         $qigen = $this->getDataGenerator()->get_plugin_generator('enrol_solaissits');
         $qigen->create_queued_item([
             'userid' => $student1->id,

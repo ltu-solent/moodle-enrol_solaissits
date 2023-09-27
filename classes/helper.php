@@ -26,6 +26,7 @@
 namespace enrol_solaissits;
 
 use core_course\customfield\course_handler;
+use stdClass;
 
 /**
  * Helper class

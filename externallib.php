@@ -82,6 +82,7 @@ class enrol_solaissits_external extends external_api {
                                                            // (except if the DB doesn't support it).
 
         // Retrieve the enrolment plugin.
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         if (empty($enrol)) {
             throw new moodle_exception('pluginnotinstalled', 'enrol_solaissits');
@@ -226,6 +227,7 @@ class enrol_solaissits_external extends external_api {
         $params = self::validate_parameters(self::unenrol_users_parameters(), array('enrolments' => $enrolments));
         require_once($CFG->libdir . '/enrollib.php');
         $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs.
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         if (empty($enrol)) {
             throw new moodle_exception('pluginnotinstalled', 'enrol_solaissits');
@@ -329,6 +331,7 @@ class enrol_solaissits_external extends external_api {
         }
         course_require_view_participants($coursecontext);
         $user = $DB->get_record('user', ['idnumber' => $useridnumber], '*', MUST_EXIST);
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         if (empty($enrol)) {
             throw new moodle_exception('pluginnotinstalled', 'enrol_solaissits');
@@ -502,6 +505,7 @@ class enrol_solaissits_external extends external_api {
             throw new moodle_exception('errorcoursecontextnotvalid' , 'webservice', '', $exceptionparam);
         }
         course_require_view_participants($coursecontext);
+        /** @var \enrol_solaissits_plugin $enrol */
         $enrol = enrol_get_plugin('solaissits');
         if (empty($enrol)) {
             throw new moodle_exception('pluginnotinstalled', 'enrol_solaissits');

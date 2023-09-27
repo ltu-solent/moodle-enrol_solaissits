@@ -40,7 +40,7 @@ class role_actions_setting extends admin_setting {
     public function __construct($role) {
         $default = json_encode([
             'course' => ENROL_EXT_REMOVED_UNENROL,
-            'module' => ENROL_EXT_REMOVED_UNENROL
+            'module' => ENROL_EXT_REMOVED_UNENROL,
         ]);
         parent::__construct('enrol_solaissits/roleactions_' . $role->id, $role->localname, '', $default);
     }
@@ -124,7 +124,7 @@ class role_actions_setting extends admin_setting {
             ENROL_EXT_REMOVED_UNENROL => get_string('extremovedunenrol', 'enrol'),
             ENROL_EXT_REMOVED_KEEP => get_string('extremovedkeep', 'enrol'),
             ENROL_EXT_REMOVED_SUSPEND => get_string('extremovedsuspend', 'enrol'),
-            ENROL_EXT_REMOVED_SUSPENDNOROLES => get_string('extremovedsuspendnoroles', 'enrol')
+            ENROL_EXT_REMOVED_SUSPENDNOROLES => get_string('extremovedsuspendnoroles', 'enrol'),
         ];
         $context = (object)[
             'id' => $this->get_id(),
@@ -133,16 +133,16 @@ class role_actions_setting extends admin_setting {
                 return [
                     'value' => $value,
                     'name' => $name,
-                    'selected' => $value == $data->module
+                    'selected' => $value == $data->module,
                 ];
             }, array_keys($options), array_values($options)),
             'courses' => array_map(function($value, $name) use ($data) {
                 return [
                     'value' => $value,
                     'name' => $name,
-                    'selected' => $value == $data->course
+                    'selected' => $value == $data->course,
                 ];
-            }, array_keys($options), array_values($options))
+            }, array_keys($options), array_values($options)),
         ];
 
         $element = $OUTPUT->render_from_template('enrol_solaissits/setting_role_actions', $context);

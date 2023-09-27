@@ -40,7 +40,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
     public function add_instance($course, array $fields = null) {
         global $DB;
 
-        if ($DB->record_exists('enrol', array('courseid' => $course->id, 'enrol' => 'solaissits'))) {
+        if ($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'solaissits'])) {
             // Only one instance allowed.
             return null;
         }
@@ -253,7 +253,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         $coursecontext = context_course::instance($data->courseid);
         $default = json_encode([
             'course' => ENROL_EXT_REMOVED_UNENROL,
-            'module' => ENROL_EXT_REMOVED_UNENROL
+            'module' => ENROL_EXT_REMOVED_UNENROL,
         ]);
         // Unenrol doesn't have any role associated with the action. TODO: What to do?
         // You don't need to know the role to do an unenrol, however, we want to do different things
@@ -272,7 +272,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
             return;
         }
         // Loops through all enrolment methods, try to unenrol if roleid matches.
-        $instances = $DB->get_records('enrol', array('courseid' => $data->courseid));
+        $instances = $DB->get_records('enrol', ['courseid' => $data->courseid]);
         $unenrolled = false;
         // Not convinced we need to roll through all the instances.
         foreach ($instances as $instance) {
@@ -293,8 +293,8 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 }
             }
             // Does this user have any other roles?
-            $componentroles = array();
-            $manualroles = array();
+            $componentroles = [];
+            $manualroles = [];
             $ras = $DB->get_records('role_assignments', ['userid' => $data->userid, 'contextid' => $coursecontext->id]);
             foreach ($ras as $ra) {
                 if ($ra->component === '') {
@@ -335,8 +335,8 @@ class enrol_solaissits_plugin extends enrol_plugin {
                         'contextid' => $coursecontext->id,
                         'userid' => $data->userid,
                         'component' => 'enrol_' . $instance->enrol,
-                        'itemid' => $instance->id],
-                    true);
+                        'itemid' => $instance->id,
+                    ], true);
                     if ($trace) {
                         $trace->output("User $data->userid enrolment was suspended in
                             course $data->courseid (enrol_$instance->enrol)", 1);
@@ -356,8 +356,8 @@ class enrol_solaissits_plugin extends enrol_plugin {
                     'contextid' => $coursecontext->id,
                     'userid' => $data->userid,
                     'component' => '',
-                    'itemid' => 0],
-                true);
+                    'itemid' => 0,
+                ], true);
             }
             if ($trace) {
                 $trace->output("User $data->userid (with role $data->roleid) not unenrolled from course $data->courseid", 1);
@@ -488,7 +488,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 $items[$key]->groups[] = [
                     'id' => $groupaction->id,
                     'name' => $groupaction->groupname,
-                    'action' => $groupaction->action
+                    'action' => $groupaction->action,
                 ];
             }
         }
@@ -504,7 +504,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
      */
     public function get_enrolments_for($userid, $courseid) {
         global $DB;
-        $enrol = $DB->get_record('enrol', array('courseid' => $courseid, 'enrol' => 'solaissits'));
+        $enrol = $DB->get_record('enrol', ['courseid' => $courseid, 'enrol' => 'solaissits']);
         $user = $DB->get_record('user', ['id' => $userid]);
         $course = $DB->get_record('course', ['id' => $courseid]);
         $context = context_course::instance($course->id);
@@ -519,7 +519,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         WHERE e.courseid = :courseid AND e.enrol = 'solaissits'";
         $params = [
             'userid' => $userid,
-            'courseid' => $courseid
+            'courseid' => $courseid,
         ];
         $enrolments = $DB->get_records_sql($sql, $params);
         foreach ($enrolments as $enrolment) {
@@ -534,7 +534,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 [
                     'contextid' => $context->id,
                     'enrolid' => $enrolment->enrolid,
-                    'userid' => $user->id
+                    'userid' => $user->id,
                 ]
             );
             $enrolment->roles = array_values($roleassignments);
@@ -560,7 +560,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         JOIN {user} u ON u.id = ue.userid
         WHERE e.courseid = :courseid AND e.enrol = 'solaissits'";
         $params = [
-            'courseid' => $courseid
+            'courseid' => $courseid,
         ];
         $enrolments = $DB->get_records_sql($sql, $params);
         foreach ($enrolments as $key => $enrolment) {
@@ -575,7 +575,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 [
                     'contextid' => $context->id,
                     'enrolid' => $enrolment->enrolid,
-                    'userid' => $enrolment->userid
+                    'userid' => $enrolment->userid,
                 ]
             );
             $enrolment->roles = array_values($roleassignments);
@@ -623,7 +623,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                     $item->groups[] = [
                         'id' => $groupaction->id,
                         'name' => $groupaction->groupname,
-                        'action' => $groupaction->action
+                        'action' => $groupaction->action,
                     ];
                 }
             }
@@ -695,7 +695,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 foreach ($groupactions as $groupaction) {
                     $data->groups[] = [
                         'name' => $groupaction->groupname,
-                        'action' => $groupaction->action
+                        'action' => $groupaction->action,
                     ];
                 }
             }

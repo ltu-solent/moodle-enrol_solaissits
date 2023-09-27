@@ -26,29 +26,29 @@
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'enrol_solaissits_enrol_users' => array(
+    'enrol_solaissits_enrol_users' => [
         'classname' => 'enrol_solaissits_external',
         'methodname' => 'enrol_users',
         'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Enrol users via the AIS-SITS interface',
         'capabilities' => 'enrol/solaissits:enrol',
         'type' => 'write',
-    ),
-    'enrol_solaissits_unenrol_users' => array(
+    ],
+    'enrol_solaissits_unenrol_users' => [
         'classname' => 'enrol_solaissits_external',
         'methodname' => 'unenrol_users',
         'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Unenrol users via the AIS-SITS interface',
         'capabilities' => 'enrol/solaissits:unenrol',
         'type' => 'write',
-    ),
+    ],
     'enrol_solaissits_get_enrolments' => [
         'classname' => 'enrol_solaissits_external',
         'methodname' => 'get_enrolments',
         'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Get enrolments for given user on given course',
         'capabilities' => 'enrol/solaissits:enrol',
-        'type' => 'read'
+        'type' => 'read',
     ],
     'enrol_solaissits_get_course_enrolments' => [
         'classname' => 'enrol_solaissits_external',
@@ -56,6 +56,6 @@ $functions = [
         'classpath' => 'enrol/solaissits/externallib.php',
         'description' => 'Get all enrolments for given course',
         'capabilities' => 'enrol/solaissits:enrol',
-        'type' => 'read'
-    ]
+        'type' => 'read',
+    ],
 ];

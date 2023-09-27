@@ -58,7 +58,7 @@ class queued_items extends table_sql {
             'timestart',
             'timeend',
             'groups',
-            'timemodified'
+            'timemodified',
         ];
         $this->define_columns($columns);
         $headers = [
@@ -71,7 +71,7 @@ class queued_items extends table_sql {
             get_string('timestart', 'enrol_solaissits'),
             get_string('timeend', 'enrol_solaissits'),
             get_string('groups'),
-            get_string('timemodified', 'enrol_solaissits')
+            get_string('timemodified', 'enrol_solaissits'),
         ];
         $this->define_headers($headers);
         $this->collapsible(false);

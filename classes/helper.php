@@ -86,7 +86,7 @@ class helper {
         $sql = "SELECT r.* FROM {role} r
         JOIN {role_context_levels} rcl ON rcl.roleid = r.id AND rcl.contextlevel = :coursecontextlevel";
         $params = [
-            'coursecontextlevel' => CONTEXT_COURSE
+            'coursecontextlevel' => CONTEXT_COURSE,
         ];
         $courseroles = $DB->get_records_sql($sql, $params);
         $roles = role_fix_names($courseroles);

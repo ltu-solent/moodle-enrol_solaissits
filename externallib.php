@@ -39,7 +39,7 @@ class enrol_solaissits_external extends external_api {
      */
     public static function enrol_users_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
                         'roleshortname' => new external_value(PARAM_RAW, 'Role to assign to the user'),
@@ -49,16 +49,16 @@ class enrol_solaissits_external extends external_api {
                             new external_single_structure([
                                 'name' => new external_value(PARAM_ALPHANUMEXT,
                                     'Group name. Group is created if it doesn\'t exist'),
-                                'action' => new external_value(PARAM_ALPHA, 'add or del', VALUE_OPTIONAL, 'add')
+                                'action' => new external_value(PARAM_ALPHA, 'add or del', VALUE_OPTIONAL, 'add'),
                             ]), 'Manage this user\'s group membership', VALUE_OPTIONAL
                         ),
                         'timestart' => new external_value(PARAM_INT, 'Timestamp when the enrolment start', VALUE_OPTIONAL),
                         'timeend' => new external_value(PARAM_INT, 'Timestamp when the enrolment end', VALUE_OPTIONAL),
                         'suspend' => new external_value(
-                            PARAM_INT, 'set to 1 to suspend & 0 to unsuspend the enrolment', VALUE_OPTIONAL)
+                            PARAM_INT, 'set to 1 to suspend & 0 to unsuspend the enrolment', VALUE_OPTIONAL),
                     ])
-                )
-            )
+                ),
+            ]
         );
     }
 
@@ -76,7 +76,7 @@ class enrol_solaissits_external extends external_api {
         require_once($CFG->libdir . '/enrollib.php');
 
         $params = self::validate_parameters(self::enrol_users_parameters(),
-                array('enrolments' => $enrolments));
+                ['enrolments' => $enrolments]);
 
         $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs
                                                            // (except if the DB doesn't support it).
@@ -132,7 +132,8 @@ class enrol_solaissits_external extends external_api {
                 throw new invalid_parameter_exception(
                     get_string('invalidtimestartendvalues', 'enrol_solaissits', [
                         'timestart' => $timestart,
-                        'timeend' => $timeend])
+                        'timeend' => $timeend,
+                    ])
                 );
             }
 
@@ -199,15 +200,15 @@ class enrol_solaissits_external extends external_api {
      */
     public static function unenrol_users_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'enrolments' => new external_multiple_structure(
                     new external_single_structure([
                         'useridnumber' => new external_value(PARAM_RAW, 'The user that is going to be unenrolled'),
                         'courseidnumber' => new external_value(PARAM_RAW, 'The course the user wil be unenrolled from'),
                         'roleshortname' => new external_value(PARAM_RAW, 'Role to remove from the user'),
                     ])
-                )
-            )
+                ),
+            ]
         );
     }
 
@@ -224,7 +225,7 @@ class enrol_solaissits_external extends external_api {
      */
     public static function unenrol_users($enrolments) {
         global $CFG, $DB;
-        $params = self::validate_parameters(self::unenrol_users_parameters(), array('enrolments' => $enrolments));
+        $params = self::validate_parameters(self::unenrol_users_parameters(), ['enrolments' => $enrolments]);
         require_once($CFG->libdir . '/enrollib.php');
         $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs.
         /** @var \enrol_solaissits_plugin $enrol */
@@ -243,7 +244,7 @@ class enrol_solaissits_external extends external_api {
             $context = context_course::instance($course->id);
             self::validate_context($context);
             require_capability('enrol/solaissits:unenrol', $context);
-            $instance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'solaissits'));
+            $instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'solaissits']);
             if (!$instance) {
                 throw new moodle_exception('wsnoinstance', 'enrol_solaissits', $enrolment);
             }
@@ -296,7 +297,7 @@ class enrol_solaissits_external extends external_api {
         return new external_function_parameters(
             [
                 'courseidnumber' => new external_value(PARAM_RAW, 'Course idnumber'),
-                'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'User idnumber')
+                'useridnumber' => new external_value(PARAM_ALPHANUMEXT, 'User idnumber'),
             ]
         );
     }
@@ -316,7 +317,7 @@ class enrol_solaissits_external extends external_api {
             self::get_enrolments_parameters(),
             [
                 'courseidnumber' => $courseidnumber,
-                'useridnumber' => $useridnumber
+                'useridnumber' => $useridnumber,
             ]
         );
         $course = $DB->get_record('course', ['idnumber' => $courseidnumber], '*', MUST_EXIST);
@@ -403,7 +404,7 @@ class enrol_solaissits_external extends external_api {
                                 'roleid' => new external_value(PARAM_INT, 'role id'),
                                 'name' => new external_value(PARAM_RAW, 'role name'),
                                 'shortname' => new external_value(PARAM_ALPHANUMEXT, 'role shortname'),
-                                'sortorder' => new external_value(PARAM_INT, 'role sortorder')
+                                'sortorder' => new external_value(PARAM_INT, 'role sortorder'),
                             ]
                         ), 'user roles', VALUE_OPTIONAL),
                     'preferences' => new external_multiple_structure(
@@ -418,15 +419,15 @@ class enrol_solaissits_external extends external_api {
                             [
                                 'id' => new external_value(PARAM_INT, 'Id of the course'),
                                 'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
-                                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
+                                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course'),
                             ]
-                    ), 'Courses where the user is enrolled - limited by which courses the user is able to see', VALUE_OPTIONAL)
+                    ), 'Courses where the user is enrolled - limited by which courses the user is able to see', VALUE_OPTIONAL),
                 ]
             ),
             'course' => new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Id of the course'),
                 'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
-                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
+                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course'),
             ]),
             'enrolments' => new external_multiple_structure(
                 new external_single_structure([
@@ -439,9 +440,9 @@ class enrol_solaissits_external extends external_api {
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'Role assignment id'),
                             'roleid' => new external_value(PARAM_INT, 'Role id'),
-                            'shortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname')
+                            'shortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
                         ])
-                    )
+                    ),
                 ])
             ),
             'queueditems' => new external_multiple_structure(
@@ -457,11 +458,11 @@ class enrol_solaissits_external extends external_api {
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'Id of queued group item'),
                             'action' => new external_value(PARAM_ALPHANUMEXT, 'Action - add, del'),
-                            'name' => new external_value(PARAM_RAW, 'Name of group to be assigned to this user.')
+                            'name' => new external_value(PARAM_RAW, 'Name of group to be assigned to this user.'),
                         ])
-                    )
+                    ),
                 ])
-            )
+            ),
         ]);
     }
 
@@ -473,7 +474,7 @@ class enrol_solaissits_external extends external_api {
     public static function get_course_enrolments_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'courseidnumber' => new external_value(PARAM_RAW, 'Course idnumber')
+                'courseidnumber' => new external_value(PARAM_RAW, 'Course idnumber'),
             ]
         );
 
@@ -491,7 +492,7 @@ class enrol_solaissits_external extends external_api {
         $params = self::validate_parameters(
             self::get_course_enrolments_parameters(),
             [
-                'courseidnumber' => $courseidnumber
+                'courseidnumber' => $courseidnumber,
             ]
         );
         $course = $DB->get_record('course', ['idnumber' => $courseidnumber], '*', MUST_EXIST);
@@ -516,7 +517,7 @@ class enrol_solaissits_external extends external_api {
             'id' => $course->id,
             'fullname' => $course->fullname,
             'shortname' => $course->shortname,
-            'idnumber' => $course->idnumber
+            'idnumber' => $course->idnumber,
         ];
         $return->enrolments = $enrol->get_course_enrolments($course->id);
         $return->queueditems = $enrol->get_queued_items_for(0, $course->id);
@@ -534,7 +535,7 @@ class enrol_solaissits_external extends external_api {
             'course' => new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'Id of the course'),
                 'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
-                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
+                'shortname' => new external_value(PARAM_RAW, 'Shortname of the course'),
             ]),
             'enrolments' => new external_multiple_structure(
                 new external_single_structure([
@@ -550,9 +551,9 @@ class enrol_solaissits_external extends external_api {
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'Role assignment id'),
                             'roleid' => new external_value(PARAM_INT, 'Role id'),
-                            'shortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname')
+                            'shortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
                         ])
-                    )
+                    ),
                 ])
             ),
             'queueditems' => new external_multiple_structure(
@@ -571,11 +572,11 @@ class enrol_solaissits_external extends external_api {
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'Id of queued group item'),
                             'action' => new external_value(PARAM_ALPHANUMEXT, 'Action - add, del'),
-                            'name' => new external_value(PARAM_RAW, 'Name of group to be assigned to this user.')
+                            'name' => new external_value(PARAM_RAW, 'Name of group to be assigned to this user.'),
                         ])
-                    )
+                    ),
                 ])
-            )
+            ),
         ]);
     }
 }

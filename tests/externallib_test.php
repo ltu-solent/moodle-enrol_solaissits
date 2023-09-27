@@ -63,7 +63,7 @@ class externallib_test extends externallib_advanced_testcase {
         // This is the minimum required for enrolments to happen using this method.
         $this->set_customfields($course2->id, [
                 'templateapplied' => 1,
-                'pagetype' => 'module'
+                'pagetype' => 'module',
             ],
             $fieldgenerator
         );
@@ -72,7 +72,7 @@ class externallib_test extends externallib_advanced_testcase {
         $context2 = \context_course::instance($course2->id);
         // The instances don't automatically exist. They are created when an attempt to enrol someone happens.
         try {
-            $instance1 = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
+            $instance1 = $DB->get_record('enrol', ['courseid' => $course1->id, 'enrol' => 'solaissits'], '*', MUST_EXIST);
             $this->fail('Exception expected as the enrolment method hasn\'t been added yet');
         } catch (moodle_exception $ex) {
             $this->assertInstanceOf('dml_missing_record_exception', $ex);
@@ -85,15 +85,15 @@ class externallib_test extends externallib_advanced_testcase {
             ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC101'],
             ['roleshortname' => 'student', 'useridnumber' => 'Student1', 'courseidnumber' => 'ABC102'],
             ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC102'],
-            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102']
+            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102'],
         ]);
-        $instance1 = $DB->get_record('enrol', array('courseid' => $course1->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
-        $instance2 = $DB->get_record('enrol', array('courseid' => $course2->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
+        $instance1 = $DB->get_record('enrol', ['courseid' => $course1->id, 'enrol' => 'solaissits'], '*', MUST_EXIST);
+        $instance2 = $DB->get_record('enrol', ['courseid' => $course2->id, 'enrol' => 'solaissits'], '*', MUST_EXIST);
         $this->assertIsObject($instance1);
         // The template hasn't been applied to course1, so these are queued, but course2 enrolments have been successful.
-        $this->assertEquals(0, $DB->count_records('user_enrolments', array('enrolid' => $instance1->id)));
+        $this->assertEquals(0, $DB->count_records('user_enrolments', ['enrolid' => $instance1->id]));
         $this->assertEquals(3, $DB->count_records('enrol_solaissits'));
-        $this->assertEquals(3, $DB->count_records('user_enrolments', array('enrolid' => $instance2->id)));
+        $this->assertEquals(3, $DB->count_records('user_enrolments', ['enrolid' => $instance2->id]));
         $this->assertTrue(is_enrolled($context2, $student1, '', true));
         $this->assertTrue(is_enrolled($context2, $unitleader, '', true));
         $this->assertTrue(is_enrolled($context2, $externalexaminer, '', true));
@@ -111,10 +111,10 @@ class externallib_test extends externallib_advanced_testcase {
                 'courseidnumber' => 'ABC102',
                 'groups' => [
                     [
-                        'name' => 'L4'
-                    ]
-                ]
-            ]
+                        'name' => 'L4',
+                    ],
+                ],
+            ],
         ]);
         $groups = groups_get_all_groups($course2->id);
         $this->assertCount(1, $groups);
@@ -129,14 +129,14 @@ class externallib_test extends externallib_advanced_testcase {
                 'courseidnumber' => 'ABC102',
                 'groups' => [
                     [
-                        'name' => 'L5' // Default action is 'add'.
+                        'name' => 'L5', // Default action is 'add'.
                     ],
                     [
                         'name' => 'L4',
-                        'action' => 'del'
-                    ]
-                ]
-            ]
+                        'action' => 'del',
+                    ],
+                ],
+            ],
         ]);
         $groups = groups_get_all_groups($course2->id);
         $this->assertCount(2, $groups);
@@ -154,8 +154,8 @@ class externallib_test extends externallib_advanced_testcase {
                 'roleshortname' => 'student',
                 'useridnumber' => 'Student1',
                 'courseidnumber' => 'ABC102',
-                'suspend' => 1
-            ]
+                'suspend' => 1,
+            ],
         ]);
         $this->assertFalse(is_enrolled($context2, $student1, '', true)); // Excludes suspended users.
 
@@ -184,16 +184,16 @@ class externallib_test extends externallib_advanced_testcase {
         $course = self::getDataGenerator()->create_course(['idnumber' => 'ABC101']);
         $enrol->add_instance($course);
         $coursecontext = \context_course::instance($course->id);
-        $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'solaissits'), '*', MUST_EXIST);
+        $enrolinstance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'solaissits'], '*', MUST_EXIST);
 
         $fieldgenerator = $this->setup_customfields();
         // Course has had a template applied, and is a module pagetype.
         // This is the minimum required for unenrolments to happen using this method.
         $this->set_customfields($course->id, [
                 'templateapplied' => 1,
-                'pagetype' => 'module'
+                'pagetype' => 'module',
             ],
-            $fieldgenerator
+            $fieldgenerator,
         );
 
         // Create a student and enrol them into the course.
@@ -202,7 +202,11 @@ class externallib_test extends externallib_advanced_testcase {
         $this->assertTrue(is_enrolled($coursecontext, $student));
         // Call the web service to unenrol.
         \enrol_solaissits_external::unenrol_users([
-            ['useridnumber' => $student->idnumber, 'courseidnumber' => $course->idnumber, 'roleshortname' => 'student']
+            [
+                'useridnumber' => $student->idnumber,
+                'courseidnumber' => $course->idnumber,
+                'roleshortname' => 'student',
+            ],
         ]);
         $this->assertFalse(is_enrolled($coursecontext, $student));
     }
@@ -232,9 +236,9 @@ class externallib_test extends externallib_advanced_testcase {
                 'groups' => [
                     [
                         'name' => 'L4',
-                        'action' => 'add'
-                    ]
-                ]
+                        'action' => 'add',
+                    ],
+                ],
             ],
             ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC101'],
             ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC101'],
@@ -242,13 +246,13 @@ class externallib_test extends externallib_advanced_testcase {
                 'groups' => [
                     [
                         'name' => 'L4',
-                        'action' => 'add'
-                    ]
-                ]
+                        'action' => 'add',
+                    ],
+                ],
             ],
             ['roleshortname' => 'student', 'useridnumber' => 'Student2', 'courseidnumber' => 'ABC102'],
             ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC102'],
-            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102']
+            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102'],
         ]);
 
         $enrolments = \enrol_solaissits_external::get_enrolments('ABC101', 'Student1');
@@ -302,12 +306,12 @@ class externallib_test extends externallib_advanced_testcase {
                 'groups' => [
                     [
                         'name' => 'L4',
-                        'action' => 'add'
-                    ]
-                ]
+                        'action' => 'add',
+                    ],
+                ],
             ],
             ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC101'],
-            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC101']
+            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC101'],
         ];
         \enrol_solaissits_external::enrol_users($enrol['abc101']);
         $enrol['abc102'] = [
@@ -315,13 +319,13 @@ class externallib_test extends externallib_advanced_testcase {
                 'groups' => [
                     [
                         'name' => 'L4',
-                        'action' => 'add'
-                    ]
-                ]
+                        'action' => 'add',
+                    ],
+                ],
             ],
             ['roleshortname' => 'student', 'useridnumber' => 'Student2', 'courseidnumber' => 'ABC102'],
             ['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader1', 'courseidnumber' => 'ABC102'],
-            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102']
+            ['roleshortname' => 'externalexaminer', 'useridnumber' => 'ExternalExaminer1', 'courseidnumber' => 'ABC102'],
         ];
         \enrol_solaissits_external::enrol_users($enrol['abc102']);
 
@@ -332,16 +336,16 @@ class externallib_test extends externallib_advanced_testcase {
         $users = [
             $student1->idnumber => [
                 'user' => $student1,
-                'role' => 'student'
+                'role' => 'student',
             ],
             $unitleader->idnumber => [
                 'user' => $unitleader,
-                'role' => 'unitleader'
+                'role' => 'unitleader',
             ],
             $externalexaminer->idnumber => [
                 'user' => $externalexaminer,
-                'role' => 'externalexaminer'
-            ]
+                'role' => 'externalexaminer',
+            ],
         ];
         foreach ($users as $idnumber => $user) {
             $matches = array_filter($enrolments->enrolments, function($enrolment) use ($idnumber) {
@@ -356,7 +360,7 @@ class externallib_test extends externallib_advanced_testcase {
         $this->assertCount(0, $enrolments->queueditems);
         $users[$student2->idnumber] = [
             'user' => $student2,
-            'role' => 'student'
+            'role' => 'student',
         ];
         $enrolments = \enrol_solaissits_external::get_course_enrolments($course2->idnumber);
         $this->assertSame($course2->idnumber, $enrolments->course->idnumber);
@@ -378,8 +382,13 @@ class externallib_test extends externallib_advanced_testcase {
         foreach ($enrolments->enrolments as $enrolment) {
             foreach ($enrolment->roles as $role) {
                 if ($role->shortname == 'unitleader') {
-                    $unenrol = [['useridnumber' => $enrolment->useridnumber, 'courseidnumber' => 'ABC102',
-                        'roleshortname' => 'unitleader']];
+                    $unenrol = [
+                        [
+                            'useridnumber' => $enrolment->useridnumber,
+                            'courseidnumber' => 'ABC102',
+                            'roleshortname' => 'unitleader',
+                        ],
+                    ];
                     \enrol_solaissits_external::unenrol_users($unenrol);
                 }
             }
@@ -387,8 +396,13 @@ class externallib_test extends externallib_advanced_testcase {
         // Just in case their enrolment has been queued.
         foreach ($enrolments->queueditems as $queueditem) {
             if ($queueditem->roleshortname == 'unitleader') {
-                $unenrol = [['useridnumber' => $queueditem->useridnumber, 'courseidnumber' => 'ABC102',
-                    'roleshortname' => 'unitleader']];
+                $unenrol = [
+                    [
+                        'useridnumber' => $queueditem->useridnumber,
+                        'courseidnumber' => 'ABC102',
+                        'roleshortname' => 'unitleader',
+                    ],
+                ];
                 // The unenrol action will be queued for ABC102.
                 // But the queue will be actioned sequentially, so this user will be enrolled,
                 // then eventually unenrolled.
@@ -406,8 +420,13 @@ class externallib_test extends externallib_advanced_testcase {
         foreach ($enrolments->enrolments as $enrolment) {
             foreach ($enrolment->roles as $role) {
                 if ($role->shortname == 'unitleader') {
-                    $unenrol = [['useridnumber' => $enrolment->useridnumber, 'courseidnumber' => 'ABC101',
-                        'roleshortname' => 'unitleader']];
+                    $unenrol = [
+                        [
+                            'useridnumber' => $enrolment->useridnumber,
+                            'courseidnumber' => 'ABC101',
+                            'roleshortname' => 'unitleader',
+                        ],
+                    ];
                     \enrol_solaissits_external::unenrol_users($unenrol);
                 }
             }
@@ -415,8 +434,13 @@ class externallib_test extends externallib_advanced_testcase {
         // Just in case their enrolment has been queued.
         foreach ($enrolments->queueditems as $queueditem) {
             if ($queueditem->roleshortname == 'unitleader') {
-                $unenrol = [['useridnumber' => $queueditem->useridnumber, 'courseidnumber' => 'ABC101',
-                    'roleshortname' => 'unitleader']];
+                $unenrol = [
+                    [
+                        'useridnumber' => $queueditem->useridnumber,
+                        'courseidnumber' => 'ABC101',
+                        'roleshortname' => 'unitleader',
+                    ],
+                ];
                 \enrol_solaissits_external::unenrol_users($unenrol);
             }
         }
@@ -424,8 +448,13 @@ class externallib_test extends externallib_advanced_testcase {
         $this->assertCount(2, $enrolments->enrolments);
         $this->assertCount(0, $enrolments->queueditems);
 
-        $enrol['unitleader2-abc101'] = [['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader2',
-            'courseidnumber' => 'ABC101']];
+        $enrol['unitleader2-abc101'] = [
+            [
+                'roleshortname' => 'unitleader',
+                'useridnumber' => 'UnitLeader2',
+                'courseidnumber' => 'ABC101',
+            ],
+        ];
         \enrol_solaissits_external::enrol_users($enrol['unitleader2-abc101']);
         $enrolments = \enrol_solaissits_external::get_course_enrolments($course1->idnumber);
         $this->assertCount(3, $enrolments->enrolments);
@@ -439,8 +468,13 @@ class externallib_test extends externallib_advanced_testcase {
             }
         }
 
-        $enrol['unitleader2-abc102'] = [['roleshortname' => 'unitleader', 'useridnumber' => 'UnitLeader2',
-            'courseidnumber' => 'ABC102']];
+        $enrol['unitleader2-abc102'] = [
+            [
+                'roleshortname' => 'unitleader',
+                'useridnumber' => 'UnitLeader2',
+                'courseidnumber' => 'ABC102',
+            ],
+        ];
         \enrol_solaissits_external::enrol_users($enrol['unitleader2-abc102']);
         $enrolments = \enrol_solaissits_external::get_course_enrolments($course2->idnumber);
         $this->assertCount(0, $enrolments->enrolments);

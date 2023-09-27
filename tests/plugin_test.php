@@ -70,8 +70,8 @@ class plugin_test extends externallib_advanced_testcase {
             'userid' => $user->id,
             'courseid' => $course->id,
             'groups' => [
-                'groupname' => 'daftpunk'
-            ]
+                'groupname' => 'daftpunk',
+            ],
         ]);
         $instanceid = $enrol->add_instance($course);
         $instances = enrol_get_instances($course->id, true);
@@ -109,14 +109,14 @@ class plugin_test extends externallib_advanced_testcase {
         $this->set_customfields($course1->id,
             [
                 'pagetype' => 'module',
-                'templateapplied' => 0
+                'templateapplied' => 0,
             ],
             $customfields
         );
         $this->set_customfields($course2->id,
             [
                 'pagetype' => 'module',
-                'templateapplied' => 1
+                'templateapplied' => 1,
             ],
             $customfields
         );
@@ -133,8 +133,8 @@ class plugin_test extends externallib_advanced_testcase {
         $data->groups = [
             [
                 'action' => 'add',
-                'name' => 'L4'
-            ]
+                'name' => 'L4',
+            ],
         ];
         $enrol->external_enrol_user($data);
 
@@ -143,7 +143,8 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertCount(1, $DB->get_records('enrol_solaissits', [
             'courseid' => $course1->id,
             'userid' => $student1->id,
-            'roleid' => $studentrole->id]));
+            'roleid' => $studentrole->id,
+        ]));
         // User is not a member of any group.
         $this->assertCount(0, groups_get_all_groups($course1->id, $student1->id));
 
@@ -154,7 +155,8 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertCount(0, $DB->get_records('enrol_solaissits', [
             'courseid' => $course2->id,
             'userid' => $student1->id,
-            'roleid' => $studentrole->id]));
+            'roleid' => $studentrole->id,
+        ]));
         // User is a member of the L4 group.
         $groups = groups_get_all_groups($course2->id, $student1->id);
         $this->assertCount(1, $groups);
@@ -170,11 +172,11 @@ class plugin_test extends externallib_advanced_testcase {
         $data->groups = [
             [
                 'action' => 'add',
-                'name' => 'L5'
+                'name' => 'L5',
             ], [
                 'action' => 'del',
-                'name' => 'L4'
-            ]
+                'name' => 'L4',
+            ],
         ];
         $enrol->external_enrol_user($data);
         $groups = groups_get_all_groups($course2->id);
@@ -210,11 +212,11 @@ class plugin_test extends externallib_advanced_testcase {
         // We want to suspend the student on Modules, and totally unenrol them from courses.
         $enrol->set_config('roleactions_' . $studentrole->id, json_encode([
             'module' => ENROL_EXT_REMOVED_SUSPEND,
-            'course' => ENROL_EXT_REMOVED_UNENROL
+            'course' => ENROL_EXT_REMOVED_UNENROL,
         ]));
         $enrol->set_config('roleactions_' . $unitleaderrole->id, json_encode([
             'module' => ENROL_EXT_REMOVED_UNENROL,
-            'course' => ENROL_EXT_REMOVED_KEEP
+            'course' => ENROL_EXT_REMOVED_KEEP,
         ]));
 
         $student = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);
@@ -227,7 +229,7 @@ class plugin_test extends externallib_advanced_testcase {
             $module->id,
             [
                 'templateapplied' => 1,
-                'pagetype' => 'module'
+                'pagetype' => 'module',
             ],
             $customfields
         );
@@ -239,7 +241,7 @@ class plugin_test extends externallib_advanced_testcase {
             $course->id,
             [
                 'templateapplied' => 1,
-                'pagetype' => 'course'
+                'pagetype' => 'course',
             ],
             $customfields
         );
@@ -276,7 +278,7 @@ class plugin_test extends externallib_advanced_testcase {
         // We want to suspend and remove role for the student on Modules, and totally unenrol them from courses.
         $enrol->set_config('roleactions_' . $studentrole->id, json_encode([
             'module' => ENROL_EXT_REMOVED_SUSPENDNOROLES,
-            'course' => ENROL_EXT_REMOVED_UNENROL
+            'course' => ENROL_EXT_REMOVED_UNENROL,
         ]));
         $data = new stdClass();
         $data->userid = $student->id;
@@ -346,9 +348,9 @@ class plugin_test extends externallib_advanced_testcase {
                 'groups' => [
                     [
                         'name' => 'L4',
-                        'action' => 'add'
-                    ]
-                ]
+                        'action' => 'add',
+                    ],
+                ],
             ]);
             $qis['course2'][$x] = $qigen->create_queued_item([
                 'courseid' => $courses['course2']->id,
@@ -357,9 +359,9 @@ class plugin_test extends externallib_advanced_testcase {
                 'groups' => [
                     [
                         'name' => 'L4',
-                        'action' => 'add'
-                    ]
-                ]
+                        'action' => 'add',
+                    ],
+                ],
             ]);
         }
 
@@ -437,35 +439,35 @@ class plugin_test extends externallib_advanced_testcase {
         $module1 = $this->getDataGenerator()->create_course();
         $module1context = context_course::instance($module1->id);
         $this->set_customfields($module1->id, [
-            'pagetype' => 'module'
+            'pagetype' => 'module',
         ], $customfields);
 
         $module2 = $this->getDataGenerator()->create_course();
         $module2context = context_course::instance($module2->id);
         $this->set_customfields($module2->id, [
             'pagetype' => 'module',
-            'templateapplied' => 1
+            'templateapplied' => 1,
         ], $customfields);
 
         $course1 = $this->getDataGenerator()->create_course();
         $course1context = context_course::instance($course1->id);
         $course1custom = $this->set_customfields($course1->id, [
             'pagetype' => 'course',
-            'templateapplied' => 0
+            'templateapplied' => 0,
         ], $customfields);
 
         $course2 = $this->getDataGenerator()->create_course();
         $course2context = context_course::instance($course2->id);
         $this->set_customfields($course2->id, [
             'pagetype' => 'course',
-            'templateapplied' => 1
+            'templateapplied' => 1,
         ], $customfields);
 
         // This course is going to be deleted before any enrolments have been processed.
         $course3 = $this->getDataGenerator()->create_course();
         $this->set_customfields($course3->id, [
             'pagetype' => 'course',
-            'templateapplied' => 0
+            'templateapplied' => 0,
         ], $customfields);
 
         $student1 = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);
@@ -483,20 +485,20 @@ class plugin_test extends externallib_advanced_testcase {
         $qigen->create_queued_item([
             'userid' => $student1->id,
             'courseid' => $module1->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student1->id,
             'courseid' => $module2->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student1->id,
             'courseid' => $course1->id,
             'roleid' => $studentrole->id,
             'groups' => [
-                ['groupname' => 'L4']
-            ]
+                ['groupname' => 'L4'],
+            ],
         ]);
         // Second queued item for student 1 on course 1.
         $qigen->create_queued_item([
@@ -505,60 +507,60 @@ class plugin_test extends externallib_advanced_testcase {
             'roleid' => $studentrole->id,
             'groups' => [
                 ['action' => 'del', 'groupname' => 'L4'],
-                ['action' => 'add', 'groupname' => 'L5']
-            ]
+                ['action' => 'add', 'groupname' => 'L5'],
+            ],
         ]);
         $qigen->create_queued_item([
             'userid' => $student1->id,
             'courseid' => $course2->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         // Put student3 (which will be deleted) before student2 to ensure processing continues.
         $qigen->create_queued_item([
             'userid' => $student3->id,
             'courseid' => $module1->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student4->id,
             'courseid' => $module1->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student2->id,
             'courseid' => $module1->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student2->id,
             'courseid' => $module2->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student2->id,
             'courseid' => $course1->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student2->id,
             'courseid' => $course2->id,
-            'roleid' => $studentrole->id
+            'roleid' => $studentrole->id,
         ]);
         $qigen->create_queued_item([
             'userid' => $student1->id,
             'courseid' => $course3->id,
             'roleid' => $studentrole->id,
             'groups' => [
-                ['action' => 'add', 'groupname' => 'L5']
-            ]
+                ['action' => 'add', 'groupname' => 'L5'],
+            ],
         ]);
         $qigen->create_queued_item([
             'userid' => $student2->id,
             'courseid' => $course3->id,
             'roleid' => $studentrole->id,
             'groups' => [
-                ['action' => 'add', 'groupname' => 'L4']
-            ]
+                ['action' => 'add', 'groupname' => 'L4'],
+            ],
         ]);
         // 13 Queued items before sync begins.
         $this->assertCount(13, $DB->get_records('enrol_solaissits'));

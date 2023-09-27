@@ -79,7 +79,9 @@ trait helper_trait {
         // Student role already exists, but create unitleader and externalexaminer.
         $unitleaderrole = $this->getDataGenerator()->create_role(['name' => 'Module leader', 'shortname' => 'unitleader']);
         $externalexaminerrole = $this->getDataGenerator()->create_role([
-            'name' => 'External Examiner', 'shortname' => 'externalexaminer']);
+            'name' => 'External Examiner',
+            'shortname' => 'externalexaminer',
+        ]);
         core_role_set_assign_allowed($wsroleid, 5); // Student.
         core_role_set_assign_allowed($wsroleid, $unitleaderrole);
         core_role_set_assign_allowed($wsroleid, $externalexaminerrole);
@@ -88,11 +90,11 @@ trait helper_trait {
             'roles' => [
                 'unitleader' => $unitleaderrole,
                 'externalexaminer' => $externalexaminerrole,
-                'ws' => $wsrole
+                'ws' => $wsrole,
             ],
             'users' => [
-                'ws' => $wsuser
-            ]
+                'ws' => $wsuser,
+            ],
         ];
     }
 
@@ -106,23 +108,23 @@ trait helper_trait {
         $fieldcat = $fieldgenerator->create_category(
             [
                 'name' => 'Student Records System',
-                'contextid' => context_system::instance()->id
+                'contextid' => context_system::instance()->id,
             ]
         );
         $templateappliedfield = $fieldgenerator->create_field([
             'shortname' => 'templateapplied',
             'categoryid' => $fieldcat->get('id'),
-            'type' => 'text'
+            'type' => 'text',
         ]);
         $pagetypefield = $fieldgenerator->create_field([
             'shortname' => 'pagetype',
             'categoryid' => $fieldcat->get('id'),
-            'type' => 'text'
+            'type' => 'text',
         ]);
         return [
             'generator' => $fieldgenerator,
             'templateappliedfield' => $templateappliedfield,
-            'pagetypefield' => $pagetypefield
+            'pagetypefield' => $pagetypefield,
         ];
     }
 

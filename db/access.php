@@ -26,36 +26,33 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-$capabilities = array(
-
-    'enrol/solaissits:config' => array(
+$capabilities = [
+    'enrol/solaissits:config' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes' => [
             'manager' => CAP_ALLOW,
-        )
-    ),
-
-    'enrol/solaissits:manage' => array(
+        ],
+    ],
+    'enrol/solaissits:manage' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes' => [
             'manager' => CAP_ALLOW,
-        )
-    ),
-
-    'enrol/solaissits:unenrol' => array(
+        ],
+    ],
+    'enrol/solaissits:unenrol' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes' => [
             'manager' => CAP_ALLOW,
-        )
-    ),
-    'enrol/solaissits:enrol' => array(
+        ],
+    ],
+    'enrol/solaissits:enrol' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
+        'archetypes' => [
             'manager' => CAP_ALLOW,
-        )
-    ),
-);
+        ],
+    ],
+];

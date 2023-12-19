@@ -643,4 +643,78 @@ class plugin_test extends externallib_advanced_testcase {
 
         $this->expectOutputString($expectedstring);
     }
+
+    /**
+     * Test get_course_enrolments
+     * @covers \enrol_solaissits_plugin::get_course_enrolments
+     *
+     * @return void
+     */
+    public function test_get_course_enrolments() {
+        $this->resetAfterTest();
+        $this->enable_plugin();
+        /** @var \enrol_solaissits_plugin $enrol */
+        $enrol = enrol_get_plugin('solaissits');
+        $courses = [];
+        $courses['course1']  = $this->getDataGenerator()->create_course(['shortname' => 'course1']);
+        $courses['course2']  = $this->getDataGenerator()->create_course(['shortname' => 'course2']);
+        $c1instance = $enrol->add_instance($courses['course1']);
+        $c2instance = $enrol->add_instance($courses['course2']);
+        $groups['course1'] = $this->getDataGenerator()->create_group([
+            'name' => 'L4',
+            'courseid' => $courses['course1']->id,
+        ]);
+        $groups['course2'] = $this->getDataGenerator()->create_group([
+            'name' => 'L5',
+            'courseid' => $courses['course2']->id,
+        ]);
+        $users = [];
+        $ces = ['course1' => [], 'course2' => []];
+        for ($x = 0; $x < 10; $x++) {
+            $users[$x] = $this->getDataGenerator()->create_user(
+                [
+                    'username' => 'username' . $x,
+                    'idnumber' => 'Student' . $x,
+                ]
+            );
+            $ces['course1'][$x] = $this->getDataGenerator()
+                ->enrol_user($users[$x]->id, $courses['course1']->id, 'student', 'solaissits');
+            groups_add_member($groups['course1'], $users[$x]);
+            $ces['course2'][$x] = $this->getDataGenerator()
+                ->enrol_user($users[$x]->id, $courses['course2']->id, 'student', 'solaissits');
+            groups_add_member($groups['course2'], $users[$x]);
+        }
+
+        $enrolments = $enrol->get_course_enrolments($courses['course1']->id);
+        for ($x = 0; $x < 10; $x++) {
+            $user = $users[$x];
+            $matches = array_filter($enrolments, function($item) use ($user) {
+                return $user->id == $item->userid;
+            });
+            $this->assertCount(1, $matches);
+            $match = reset($matches);
+            $this->assertEquals($user->id, $match->userid);
+            $this->assertEquals($c1instance, $match->enrolid);
+            $this->assertCount(1, $match->roles);
+            $this->assertEquals($match->roles[0]->shortname, 'student');
+            $this->assertCount(1, $match->groups);
+            $this->assertEquals($match->groups[0]->name, 'L4');
+        }
+
+        $enrolments = $enrol->get_course_enrolments($courses['course2']->id);
+        for ($x = 0; $x < 10; $x++) {
+            $user = $users[$x];
+            $matches = array_filter($enrolments, function($item) use ($user) {
+                return $user->id == $item->userid;
+            });
+            $this->assertCount(1, $matches);
+            $match = reset($matches);
+            $this->assertEquals($user->id, $match->userid);
+            $this->assertEquals($c2instance, $match->enrolid);
+            $this->assertCount(1, $match->roles);
+            $this->assertEquals($match->roles[0]->shortname, 'student');
+            $this->assertCount(1, $match->groups);
+            $this->assertEquals($match->groups[0]->name, 'L5');
+        }
+    }
 }

@@ -554,6 +554,12 @@ class enrol_solaissits_external extends external_api {
                             'shortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
                         ])
                     ),
+                    'groups' => new external_multiple_structure(
+                        new external_single_structure([
+                            'id' => new external_value(PARAM_INT, 'Id of group'),
+                            'name' => new external_value(PARAM_RAW, 'Name of group assigned to this user'),
+                        ])
+                    ),
                 ])
             ),
             'queueditems' => new external_multiple_structure(

@@ -563,6 +563,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
             'courseid' => $courseid,
         ];
         $enrolments = $DB->get_records_sql($sql, $params);
+        $coursegroups = groups_get_course_data($courseid);
         foreach ($enrolments as $key => $enrolment) {
             $roleassignments = $DB->get_records_sql(
                 "SELECT ra.id, ra.roleid, r.shortname
@@ -579,6 +580,16 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 ]
             );
             $enrolment->roles = array_values($roleassignments);
+            $usergroups = [];
+            foreach ($coursegroups->groups as $coursegroup) {
+                if (groups_is_member($coursegroup->id, $enrolment->userid)) {
+                    $usergroups[] = (object)[
+                        'id' => $coursegroup->id,
+                        'name' => $coursegroup->name,
+                    ];
+                }
+            }
+            $enrolment->groups = $usergroups;
             $enrolments[$key] = $enrolment;
         }
         return $enrolments;

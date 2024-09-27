@@ -37,7 +37,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
      * @param array $fields instance fields
      * @return int|null id of new instance, null if can not be created
      */
-    public function add_instance($course, array $fields = null) {
+    public function add_instance($course, ?array $fields = null) {
         global $DB;
 
         if ($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'solaissits'])) {

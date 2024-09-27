@@ -34,7 +34,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
     /**
      * Add new instance of enrol plugin.
      * @param stdClass $course
-     * @param array $fields instance fields
+     * @param array|null $fields instance fields
      * @return int|null id of new instance, null if can not be created
      */
     public function add_instance($course, ?array $fields = null) {

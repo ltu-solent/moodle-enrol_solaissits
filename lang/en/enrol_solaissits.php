@@ -28,11 +28,16 @@ defined('MOODLE_INTERNAL') || die();
 $string['add'] = 'Add';
 
 $string['component'] = 'SITS enrolments';
+$string['confirmbulkdeleteenrolment'] = 'Are you sure you want to delete these user enrolments?';
 $string['course'] = 'Course';
 $string['coursedoesntexist'] = 'Course doesn\'t exist: {$a}';
+$string['courseidnotset'] = 'Courseid not set';
+$string['coursenotset'] = 'Course not set';
 
 $string['del'] = 'Delete';
+$string['deleteselectedusers'] = 'Delete selected user enrolments';
 
+$string['editselectedusers'] = 'Edit selected user enrolments';
 $string['enrolsync'] = 'SITS enrolment sync task';
 
 $string['id'] = 'ID';
@@ -43,6 +48,7 @@ $string['missingroleid'] = 'Roleid not provided';
 $string['missinguserid'] = 'Userid not provided';
 $string['module'] = 'Module';
 
+$string['noenrol'] = 'No enrolment method specified';
 $string['nottemplated'] = 'Not templated';
 $string['notvisible'] = 'Not visible';
 
@@ -56,6 +62,7 @@ $string['queueditemsheading'] = 'Queued enrolment items from SITS';
 $string['roleactions'] = 'Role enrolment actions';
 $string['roleactions_desc'] = 'Depending on the role and page type, a request to unenrol a user in a course will perform the following actions.';
 $string['roledoesntexist'] = 'Role doesn\'t exist: {$a}';
+$string['roleidnotset'] = 'Roleid not set';
 
 $string['settings'] = 'Settings';
 $string['solaissits:config'] = 'Configure enrolment on payment enrol instances';
@@ -68,8 +75,10 @@ $string['timeend'] = 'Enrolment ends';
 $string['timemodified'] = 'Last modified';
 $string['timestart'] = 'Enrolment begins';
 
+$string['unenrolusers'] = 'Unenrol users';
 $string['unsuspend'] = 'Unsuspend';
 $string['userdoesntexist'] = 'User doesn\'t exist: {$a}';
+$string['useridnotset'] = 'Userid not set';
 
 $string['wscannotenrol'] = 'Plugin instance cannot enrol a user in the course id = {$a->courseid}';
 $string['wscannotunenrol'] = 'Plugin instance cannot unenrol a user in the course {$a->courseshortname}';

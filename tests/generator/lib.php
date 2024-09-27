@@ -30,7 +30,7 @@ class enrol_solaissits_generator extends component_generator_base {
     /**
      * Count of queued items
      *
-     * @var integer
+     * @var int
      */
     public $qicount = 0;
 
@@ -84,5 +84,44 @@ class enrol_solaissits_generator extends component_generator_base {
         }
         $record->groups = $groups;
         return $record;
+    }
+
+    /**
+     * Create enrolment method entity
+     *
+     * @param array|stdClass $record
+     * @return void
+     */
+    public function create_enrolment_method($record) {
+        global $DB;
+        $record = (object)(array)$record;
+        if (!isset($record->course)) {
+            throw new moodle_exception('coursenotset', 'enrol_solaissits');
+        }
+        $course = $DB->get_record('course', ['shortname' => $record->course]);
+        /** @var \enrol_plugin $enrol */
+        $enrol = enrol_get_plugin($record->method);
+        if (!$enrol) {
+            throw new moodle_exception('noenrol', 'enrol_solaissits');
+        }
+
+        $enabled = enrol_get_plugins(true);
+        $enabled[$record->method] = true;
+        $enabled = array_keys($enabled);
+        set_config('enrol_plugins_enabled', implode(',', $enabled));
+        $instance = null;
+        $enrolinstances = enrol_get_instances($course->id, true);
+        foreach ($enrolinstances as $courseenrolinstance) {
+            if ($courseenrolinstance->enrol == $record->method) {
+                $instance = $courseenrolinstance;
+                break;
+            }
+        }
+        if (empty($instance)) {
+            // Create an instance if it doesn't exist.
+            $instanceid = $enrol->add_instance($course);
+            $instances = enrol_get_instances($course->id, true);
+            $instance = $instances[$instanceid];
+        }
     }
 }

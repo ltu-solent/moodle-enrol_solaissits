@@ -783,4 +783,21 @@ class enrol_solaissits_plugin extends enrol_plugin {
         }
         return $instance;
     }
+
+    /**
+     * The solaissits plugin has several bulk operations that can be performed.
+     * @param course_enrolment_manager $manager
+     * @return array
+     */
+    public function get_bulk_operations(course_enrolment_manager $manager) {
+        $context = $manager->get_context();
+        $bulkoperations = [];
+        if (has_capability("enrol/solaissits:manage", $context)) {
+            $bulkoperations['editselectedusers'] = new \enrol_solaissits\editselectedusers_operation($manager, $this);
+        }
+        if (has_capability("enrol/solaissits:unenrol", $context)) {
+            $bulkoperations['deleteselectedusers'] = new \enrol_solaissits\deleteselectedusers_operation($manager, $this);
+        }
+        return $bulkoperations;
+    }
 }

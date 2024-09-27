@@ -27,6 +27,9 @@ namespace enrol_solaissits;
 
 use context_system;
 
+/**
+ * Just some helper functions for tests.
+ */
 trait helper_trait {
 
     /**

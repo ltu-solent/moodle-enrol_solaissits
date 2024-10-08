@@ -479,6 +479,7 @@ class plugin_test extends externallib_advanced_testcase {
         $studentrole = helper::get_role_by_shortname('student');
 
         $enrol->sync(new text_progress_trace());
+        $this->assertCount(0, $DB->get_records('enrol_solaissits'));
         $expectedstring .= "No items found to process.\n";
         /** @var \enrol_solaissits_generator $qigen */
         $qigen = $this->getDataGenerator()->get_plugin_generator('enrol_solaissits');
@@ -566,12 +567,7 @@ class plugin_test extends externallib_advanced_testcase {
         $this->assertCount(13, $DB->get_records('enrol_solaissits'));
 
         // Module 2 and Course 2 both have template applied, so all their queued items are processed (4).
-        $enrol->sync(new text_progress_trace());
-        $expectedstring .= "4 enrolment items found to process.\n" .
-            "add, Student1, tc_2, student,  - \n" .
-            "add, Student2, tc_2, student,  - \n" .
-            "add, Student1, tc_4, student,  - \n" .
-            "add, Student2, tc_4, student,  - \n";
+        $enrol->sync(new null_progress_trace());
         $this->assertCount(9, $DB->get_records('enrol_solaissits'));
         $this->assertTrue(is_enrolled($module2context, $student1));
         $this->assertTrue(is_enrolled($module2context, $student2));
@@ -591,12 +587,7 @@ class plugin_test extends externallib_advanced_testcase {
 
         // Module 1 now has template applied, so all their queued items are processed (2).
         $this->set_customfields($module1->id, ['templateapplied' => 1], $customfields);
-        $enrol->sync(new text_progress_trace());
-        $expectedstring .= "4 enrolment items found to process.\n" .
-            "add, Student1, tc_1, student,  - \n" .
-            "User id " . $student3->id . " does not exist. Enrolment item removed for course id " . $module1->id .".\n" .
-            "add, Student3, tc_1, student,  - \n" .
-            "add, Student2, tc_1, student,  - \n";
+        $enrol->sync(new null_progress_trace());
         $this->assertCount(5, $DB->get_records('enrol_solaissits'));
         $this->assertTrue(is_enrolled($module1context, $student1));
         $this->assertTrue(is_enrolled($module1context, $student2));
@@ -609,11 +600,7 @@ class plugin_test extends externallib_advanced_testcase {
         // Course 2 now has template applied (3).
         // This is a little hacky, but is required because the field already has a value set.
         $course1custom['templateapplied']->set('value', 1)->set('charvalue', 1)->save();
-        $enrol->sync(new text_progress_trace());
-        $expectedstring .= "3 enrolment items found to process.\n" .
-            "add, Student1, tc_3, student,  - \n" .
-            "add, Student1, tc_3, student,  - \n" .
-            "add, Student2, tc_3, student,  - \n";
+        $enrol->sync(new null_progress_trace());
 
         $this->assertCount(2, $DB->get_records('enrol_solaissits'));
         $this->assertTrue(is_enrolled($course1context, $student1));

@@ -62,11 +62,11 @@ class role_actions_setting extends admin_setting {
      * Write setting to DB
      *
      * @param array $data
-     * @return bool|string
+     * @return string
      */
     public function write_setting($data) {
         if (!is_array($data)) {
-            return false;
+            return '';
         }
         $setting = json_encode($data);
         $result = $this->config_write($this->name, $setting);

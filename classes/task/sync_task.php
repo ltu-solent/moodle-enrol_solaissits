@@ -25,6 +25,7 @@
 
 namespace enrol_solaissits\task;
 
+use core\output\progress_trace\text_progress_trace;
 use core\task\scheduled_task;
 
 /**
@@ -54,7 +55,7 @@ class sync_task extends scheduled_task {
         // Instance of enrol_flatfile_plugin.
         /** @var \enrol_solaissits_plugin $plugin */
         $plugin = enrol_get_plugin('solaissits');
-        $result = $plugin->sync(new \text_progress_trace());
+        $result = $plugin->sync(new text_progress_trace());
         return $result;
     }
 }

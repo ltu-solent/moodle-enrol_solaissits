@@ -37,7 +37,6 @@ global $CFG;
 
 require_once($CFG->libdir . '/enrollib.php');
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot . '/enrol/solaissits/externallib.php');
 require_once(__DIR__ . '/helper_trait.php');
 
 /**

@@ -42,7 +42,7 @@ final class enrol_users_test extends externallib_advanced_testcase {
      * Test enrol users
      * @covers \enrol_solaissits_plugin::enrol_users()
      */
-    public function test_enrol_users() {
+    public function test_enrol_users(): void {
         global $DB;
         $this->resetAfterTest();
         $this->setup_enrol();

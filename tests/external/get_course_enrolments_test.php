@@ -24,10 +24,6 @@ global $CFG;
 
 require_once(__DIR__ . '/../helper_trait.php');
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-// require_once($CFG->libdir . '/enrollib.php');
-
-// require_once($CFG->dirroot . '/enrol/solaissits/externallib.php');
-
 
 /**
  * Tests for SITS enrolments
@@ -46,7 +42,7 @@ final class get_course_enrolments_test extends externallib_advanced_testcase {
      * @covers \enrol_solaissits_external::get_course_enrolments
      * @return void
      */
-    public function test_get_course_enrolments() {
+    public function test_get_course_enrolments(): void {
         $this->resetAfterTest();
 
         $this->setup_enrol();

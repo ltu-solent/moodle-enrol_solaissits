@@ -51,7 +51,7 @@ class plugin_test extends externallib_advanced_testcase {
      * @covers \enrol_solaissits_plugin::get_enrolments_for
      * @return void
      */
-    public function test_get_enrolments_for() {
+    public function test_get_enrolments_for(): void {
         global $DB;
         $this->resetAfterTest();
         /** @var \enrol_solaissits_plugin $enrol */
@@ -93,7 +93,7 @@ class plugin_test extends externallib_advanced_testcase {
      *
      * @return void
      */
-    public function test_external_enrol_user() {
+    public function test_external_enrol_user(): void {
         global $DB;
         $this->resetAfterTest();
         $this->enable_plugin();
@@ -200,7 +200,7 @@ class plugin_test extends externallib_advanced_testcase {
      *
      * @return void
      */
-    public function test_external_unenrol_user() {
+    public function test_external_unenrol_user(): void {
         $this->resetAfterTest();
         $this->setup_enrol();
         /** @var \enrol_solaissits_plugin $enrol */
@@ -325,7 +325,7 @@ class plugin_test extends externallib_advanced_testcase {
      *
      * @return void
      */
-    public function test_get_queued_items_for() {
+    public function test_get_queued_items_for(): void {
         $this->resetAfterTest();
         $this->enable_plugin();
         /** @var \enrol_solaissits_plugin $enrol */
@@ -426,7 +426,7 @@ class plugin_test extends externallib_advanced_testcase {
      *
      * @return void
      */
-    public function test_sync() {
+    public function test_sync(): void {
         global $DB;
         $this->resetAfterTest();
         $this->setup_enrol();
@@ -636,7 +636,7 @@ class plugin_test extends externallib_advanced_testcase {
      *
      * @return void
      */
-    public function test_get_course_enrolments() {
+    public function test_get_course_enrolments(): void {
         $this->resetAfterTest();
         $this->enable_plugin();
         /** @var \enrol_solaissits_plugin $enrol */

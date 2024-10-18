@@ -43,7 +43,7 @@ final class unenrol_users_test extends externallib_advanced_testcase {
      * @throws invalid_parameter_exception
      * @throws moodle_exception
      */
-    public function test_unenrol_users() {
+    public function test_unenrol_users(): void {
         global $DB;
 
         $this->resetAfterTest(true);

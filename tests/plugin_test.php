@@ -42,7 +42,7 @@ require_once(__DIR__ . '/helper_trait.php');
 /**
  * Test the main enrolment class
  */
-class plugin_test extends externallib_advanced_testcase {
+final class plugin_test extends externallib_advanced_testcase {
     use helper_trait;
 
     /**

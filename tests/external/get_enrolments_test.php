@@ -42,7 +42,7 @@ final class get_enrolments_test extends externallib_advanced_testcase {
      * @covers \enrol_solaissits_external::get_enrolments
      * @return void
      */
-    public function test_get_enrolments() {
+    public function test_get_enrolments(): void {
         global $DB;
         $this->resetAfterTest();
 

@@ -46,7 +46,6 @@ class get_course_enrolments extends external_api {
                 'courseidnumber' => new external_value(PARAM_RAW, 'Course idnumber'),
             ]
         );
-
     }
 
     /**
@@ -72,7 +71,7 @@ class get_course_enrolments extends external_api {
             $exceptionparam = new stdClass();
             $exceptionparam->message = $e->getMessage();
             $exceptionparam->courseidnumber = $params['courseidnumber'];
-            throw new moodle_exception('errorcoursecontextnotvalid' , 'webservice', '', $exceptionparam);
+            throw new moodle_exception('errorcoursecontextnotvalid', 'webservice', '', $exceptionparam);
         }
         course_require_view_participants($coursecontext);
         /** @var \enrol_solaissits_plugin $enrol */
@@ -91,7 +90,6 @@ class get_course_enrolments extends external_api {
         $return->enrolments = $enrol->get_course_enrolments($course->id);
         $return->queueditems = $enrol->get_queued_items_for(0, $course->id);
         return $return;
-
     }
 
     /**
@@ -114,8 +112,11 @@ class get_course_enrolments extends external_api {
                     'timestart' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment begins'),
                     'timeend' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment begins'),
                     'userid' => new external_value(PARAM_INT, 'Userid'),
-                    'useridnumber' => new external_value(PARAM_RAW,
-                        'An arbitrary ID code number perhaps from the institution', VALUE_OPTIONAL),
+                    'useridnumber' => new external_value(
+                        PARAM_RAW,
+                        'An arbitrary ID code number perhaps from the institution',
+                        VALUE_OPTIONAL
+                    ),
                     'roles' => new external_multiple_structure(
                         new external_single_structure([
                             'id' => new external_value(PARAM_INT, 'Role assignment id'),
@@ -138,8 +139,11 @@ class get_course_enrolments extends external_api {
                     'roleid' => new external_value(PARAM_INT, 'Role id'),
                     'roleshortname' => new external_value(PARAM_ALPHANUMEXT, 'Role shortname'),
                     'userid' => new external_value(PARAM_INT, 'User id'),
-                    'useridnumber' => new external_value(PARAM_RAW,
-                        'An arbitrary ID code number perhaps from the institution', VALUE_OPTIONAL),
+                    'useridnumber' => new external_value(
+                        PARAM_RAW,
+                        'An arbitrary ID code number perhaps from the institution',
+                        VALUE_OPTIONAL
+                    ),
                     'courseid' => new external_value(PARAM_INT, 'Course id'),
                     'timestart' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment begins'),
                     'timeend' => new external_value(PARAM_INT, 'Unix timestamp for when the enrolment ends'),

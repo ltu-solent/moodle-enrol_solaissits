@@ -25,21 +25,35 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$ADMIN->add('enrolments', new admin_category('enrolsolaissitsfolder', new lang_string('pluginname', 'enrol_solaissits'),
-    $this->is_enabled() === false));
-$ADMIN->add('enrolsolaissitsfolder', new admin_externalpage(
-    'enrol_solaissits_queueditems',
-    get_string('queueditems', 'enrol_solaissits'),
-    new moodle_url('/enrol/solaissits/queueditems.php')));
+$ADMIN->add(
+    'enrolments',
+    new admin_category(
+        'enrolsolaissitsfolder',
+        new lang_string('pluginname', 'enrol_solaissits'),
+        $this->is_enabled() === false
+    )
+);
+$ADMIN->add(
+    'enrolsolaissitsfolder',
+    new admin_externalpage(
+        'enrol_solaissits_queueditems',
+        get_string('queueditems', 'enrol_solaissits'),
+        new moodle_url('/enrol/solaissits/queueditems.php')
+    )
+);
 // Prevent duplicate admin settings page error.
 $settings = null;
 if ($ADMIN->fulltree) {
     $settingspage = new admin_settingpage($section, new lang_string('settings', 'enrol_solaissits'));
     $ADMIN->add('enrolsolaissitsfolder', $settingspage);
     if (!during_initial_install()) {
-        $settingspage->add(new admin_setting_heading('enrol_solaissits_roleactions',
-            new lang_string('roleactions', 'enrol_solaissits'),
-            new lang_string('roleactions_desc', 'enrol_solaissits')));
+        $settingspage->add(
+            new admin_setting_heading(
+                'enrol_solaissits_roleactions',
+                new lang_string('roleactions', 'enrol_solaissits'),
+                new lang_string('roleactions_desc', 'enrol_solaissits')
+            )
+        );
         $roles = \enrol_solaissits\helper::get_roles();
         foreach ($roles as $role) {
             $settingspage->add(new \enrol_solaissits\admin\role_actions_setting($role));

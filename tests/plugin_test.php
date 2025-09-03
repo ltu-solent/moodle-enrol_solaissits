@@ -105,20 +105,8 @@ final class plugin_test extends externallib_advanced_testcase {
         $course1context = context_course::instance($course1->id);
         $course2 = $this->getDataGenerator()->create_course();
         $course2context = context_course::instance($course2->id);
-        $this->set_customfields($course1->id,
-            [
-                'pagetype' => 'module',
-                'templateapplied' => 0,
-            ],
-            $customfields
-        );
-        $this->set_customfields($course2->id,
-            [
-                'pagetype' => 'module',
-                'templateapplied' => 1,
-            ],
-            $customfields
-        );
+        $this->set_customfields($course1->id, ['pagetype' => 'module', 'templateapplied' => 0], $customfields);
+        $this->set_customfields($course2->id, ['pagetype' => 'module', 'templateapplied' => 1], $customfields);
         $student1 = $this->getDataGenerator()->create_user();
         $student2 = $this->getDataGenerator()->create_user();
         $studentrole = helper::get_role_by_shortname('student');
@@ -376,7 +364,7 @@ final class plugin_test extends externallib_advanced_testcase {
         $result = $enrol->get_queued_items_for($users[0]->id);
         $this->assertCount(2, $result);
         $courseuser0 = $qis['course1'][0];
-        $matches = array_filter($result, function($item) use ($courseuser0) {
+        $matches = array_filter($result, function ($item) use ($courseuser0) {
             return $item->id == $courseuser0->id;
         });
         $this->assertCount(1, $matches);
@@ -390,7 +378,7 @@ final class plugin_test extends externallib_advanced_testcase {
         $this->assertEquals($courseuser0->id, $match->id);
 
         $courseuser0 = $qis['course2'][0];
-        $matches = array_filter($result, function($item) use ($courseuser0) {
+        $matches = array_filter($result, function ($item) use ($courseuser0) {
             return $item->id == $courseuser0->id;
         });
         $this->assertCount(1, $matches);
@@ -408,7 +396,7 @@ final class plugin_test extends externallib_advanced_testcase {
         $this->assertCount(10, $result);
         for ($x = 0; $x < 10; $x++) {
             $user = $users[$x];
-            $matches = array_filter($result, function($item) use ($user) {
+            $matches = array_filter($result, function ($item) use ($user) {
                 return $user->id == $item->userid;
             });
             $this->assertCount(1, $matches);
@@ -674,7 +662,7 @@ final class plugin_test extends externallib_advanced_testcase {
         $enrolments = $enrol->get_course_enrolments($courses['course1']->id);
         for ($x = 0; $x < 10; $x++) {
             $user = $users[$x];
-            $matches = array_filter($enrolments, function($item) use ($user) {
+            $matches = array_filter($enrolments, function ($item) use ($user) {
                 return $user->id == $item->userid;
             });
             $this->assertCount(1, $matches);
@@ -690,7 +678,7 @@ final class plugin_test extends externallib_advanced_testcase {
         $enrolments = $enrol->get_course_enrolments($courses['course2']->id);
         for ($x = 0; $x < 10; $x++) {
             $user = $users[$x];
-            $matches = array_filter($enrolments, function($item) use ($user) {
+            $matches = array_filter($enrolments, function ($item) use ($user) {
                 return $user->id == $item->userid;
             });
             $this->assertCount(1, $matches);

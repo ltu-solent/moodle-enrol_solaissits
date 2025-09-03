@@ -31,7 +31,6 @@ use context_system;
  * Just some helper functions for tests.
  */
 trait helper_trait {
-
     /**
      * Enable SOL AIS-SITS plugin
      *
@@ -147,13 +146,15 @@ trait helper_trait {
             $data['templateapplied'] = $fieldgenerator['generator']->add_instance_data(
                 $fieldgenerator['templateappliedfield'],
                 $courseid,
-                $values['templateapplied']);
+                $values['templateapplied']
+            );
         }
         if (isset($values['pagetype'])) {
             $data['pagetype'] = $fieldgenerator['generator']->add_instance_data(
                 $fieldgenerator['pagetypefield'],
                 $courseid,
-                $values['pagetype']);
+                $values['pagetype']
+            );
         }
         return $data;
     }

@@ -32,7 +32,6 @@ use stdClass;
  * Helper class
  */
 class helper {
-
     /**
      * Get course record by course idnumber
      *

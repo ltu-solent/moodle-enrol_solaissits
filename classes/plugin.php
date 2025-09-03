@@ -179,8 +179,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
             $status = ENROL_USER_SUSPENDED;
         }
         // If the user exists and the timestart, timeend or status is different, this automatically changes to an update.
-        $this->enrol_user($instance, $data->userid, $data->roleid,
-                $data->timestart, $data->timeend, $status);
+        $this->enrol_user($instance, $data->userid, $data->roleid, $data->timestart, $data->timeend, $status);
         $this->process_groups($data->userid, $data->courseid, $data->groups);
 
         return true;
@@ -308,10 +307,8 @@ class enrol_solaissits_plugin extends enrol_plugin {
             if ($componentroles && !isset($componentroles[$data->roleid])) {
                 // Do not unenrol using this method, user has some other protected role!
                 continue;
-
             } else if (empty($ras)) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
                 // If user does not have any roles then let's just suspend as many methods as possible.
-
             } else if (!$plugin->roles_protected()) {
                 if (!$componentroles && $manualroles && !isset($manualroles[$data->roleid])) {
                     // Most likely we want to keep users enrolled because they have some other course roles.
@@ -325,7 +322,6 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 if ($trace) {
                     $trace->output("User $data->userid was unenrolled from course $data->courseid (enrol_$instance->enrol)", 1);
                 }
-
             } else if ($action == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
                 if ($plugin->allow_manage($instance)) {
                     $unenrolled = true;
@@ -421,7 +417,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
         // Unenrolements will automatically deal with group membership.
         $coursegroups = groups_get_course_data($courseid);
         foreach ($usergroups as $usergroup) {
-            $existinggroups = array_filter($coursegroups->groups, function($coursegroup) use ($usergroup) {
+            $existinggroups = array_filter($coursegroups->groups, function ($coursegroup) use ($usergroup) {
                 return ($usergroup['name'] == $coursegroup->name);
             });
             // Does the group exist?
@@ -730,8 +726,7 @@ class enrol_solaissits_plugin extends enrol_plugin {
                 $timeend = ($data->timeend > 0) ? date('Y-m-d', $data->timeend) : '';
                 $trace->output("{$data->action}, {$user->idnumber}, {$course->shortname}," .
                     " {$role->shortname}, {$timestart} - {$timeend}");
-                $this->enrol_user($instance, $data->userid, $data->roleid,
-                        $data->timestart, $data->timeend, $status);
+                $this->enrol_user($instance, $data->userid, $data->roleid, $data->timestart, $data->timeend, $status);
                 $groups = $data->groups ?? [];
                 $this->process_groups($data->userid, $data->courseid, $groups);
             }

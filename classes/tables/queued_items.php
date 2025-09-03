@@ -114,8 +114,12 @@ class queued_items extends table_sql {
             if (!is_enrolled($context, $row->userid)) {
                 return get_string('add', 'enrol_solaissits');
             }
-            if (!$DB->record_exists_select('enrol_solaissits', "id < :id AND userid = :userid AND courseid = :courseid",
-                    ['id' => $row->id, 'userid' => $row->userid, 'courseid' => $row->courseid])) {
+            $userenrolmentexists = $DB->record_exists_select(
+                'enrol_solaissits',
+                "id < :id AND userid = :userid AND courseid = :courseid",
+                ['id' => $row->id, 'userid' => $row->userid, 'courseid' => $row->courseid]
+            );
+            if (!$userenrolmentexists) {
                 return get_string('add', 'enrol_solaissits');
             }
         }

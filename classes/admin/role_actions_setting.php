@@ -31,7 +31,6 @@ use admin_setting;
  * Custom setting for defining unenrol actions for given roles.
  */
 class role_actions_setting extends admin_setting {
-
     /**
      * Constructor
      *
@@ -129,14 +128,14 @@ class role_actions_setting extends admin_setting {
         $context = (object)[
             'id' => $this->get_id(),
             'name' => $this->get_full_name(),
-            'modules' => array_map(function($value, $name) use ($data) {
+            'modules' => array_map(function ($value, $name) use ($data) {
                 return [
                     'value' => $value,
                     'name' => $name,
                     'selected' => $value == $data->module,
                 ];
             }, array_keys($options), array_values($options)),
-            'courses' => array_map(function($value, $name) use ($data) {
+            'courses' => array_map(function ($value, $name) use ($data) {
                 return [
                     'value' => $value,
                     'name' => $name,
@@ -146,7 +145,15 @@ class role_actions_setting extends admin_setting {
         ];
 
         $element = $OUTPUT->render_from_template('enrol_solaissits/setting_role_actions', $context);
-        return format_admin_setting($this, $this->visiblename, $element, $this->description,
-            $this->get_id(), '', $defaultinfo, $query);
+        return format_admin_setting(
+            $this,
+            $this->visiblename,
+            $element,
+            $this->description,
+            $this->get_id(),
+            '',
+            $defaultinfo,
+            $query
+        );
     }
 }

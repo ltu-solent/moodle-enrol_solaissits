@@ -87,7 +87,7 @@ class editselectedusers_operation extends enrol_bulk_enrolment_operation {
         $timestart = $properties->timestart;
         $timeend = $properties->timeend;
 
-        list($ueidsql, $params) = $DB->get_in_or_equal($ueids, SQL_PARAMS_NAMED);
+        [$ueidsql, $params] = $DB->get_in_or_equal($ueids, SQL_PARAMS_NAMED);
 
         $updatesql = [];
         if ($status == ENROL_USER_ACTIVE || $status == ENROL_USER_SUSPENDED) {
@@ -127,14 +127,14 @@ class editselectedusers_operation extends enrol_bulk_enrolment_operation {
                     $enrolment->enrol     = 'solaissits';
                     // Trigger event.
                     $event = \core\event\user_enrolment_updated::create(
-                            [
-                                'objectid' => $enrolment->id,
-                                'courseid' => $enrolment->courseid,
-                                'context' => context_course::instance($enrolment->courseid),
-                                'relateduserid' => $user->id,
-                                'other' => ['enrol' => 'enrol_solaissits'],
-                            ]
-                        );
+                        [
+                            'objectid' => $enrolment->id,
+                            'courseid' => $enrolment->courseid,
+                            'context' => context_course::instance($enrolment->courseid),
+                            'relateduserid' => $user->id,
+                            'other' => ['enrol' => 'enrol_solaissits'],
+                        ]
+                    );
                     $event->trigger();
                 }
             }

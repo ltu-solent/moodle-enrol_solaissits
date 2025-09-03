@@ -58,12 +58,7 @@ final class unenrol_users_test extends externallib_advanced_testcase {
         $fieldgenerator = $this->setup_customfields();
         // Course has had a template applied, and is a module pagetype.
         // This is the minimum required for unenrolments to happen using this method.
-        $this->set_customfields($course->id, [
-                'templateapplied' => 1,
-                'pagetype' => 'module',
-            ],
-            $fieldgenerator,
-        );
+        $this->set_customfields($course->id, ['templateapplied' => 1, 'pagetype' => 'module'], $fieldgenerator);
 
         // Create a student and enrol them into the course.
         $student = $this->getDataGenerator()->create_user(['idnumber' => 'Student1']);

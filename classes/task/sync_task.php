@@ -32,7 +32,6 @@ use core\task\scheduled_task;
  * Enrolment sync task
  */
 class sync_task extends scheduled_task {
-
     /**
      * Get task name
      *

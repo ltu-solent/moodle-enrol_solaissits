@@ -31,7 +31,6 @@ use Behat\Gherkin\Node\TableNode;
  * Behat steps for local solsits
  */
 class behat_enrol_solaissits extends behat_base {
-
     /**
      * Create new sits queued enrolment record
      *

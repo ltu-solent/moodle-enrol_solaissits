@@ -106,7 +106,7 @@ final class get_course_enrolments_test extends externallib_advanced_testcase {
             ],
         ];
         foreach ($users as $idnumber => $user) {
-            $matches = array_filter($enrolments->enrolments, function($enrolment) use ($idnumber) {
+            $matches = array_filter($enrolments->enrolments, function ($enrolment) use ($idnumber) {
                 return $idnumber == $enrolment->useridnumber;
             });
             $match = reset($matches);
@@ -127,7 +127,7 @@ final class get_course_enrolments_test extends externallib_advanced_testcase {
         $this->assertCount(4, $enrolments->queueditems);
         foreach ($users as $idnumber => $user) {
             $u = $user['user'];
-            $matches = array_filter($enrolments->queueditems, function($queueditem) use ($u) {
+            $matches = array_filter($enrolments->queueditems, function ($queueditem) use ($u) {
                 return $u->id == $queueditem->userid;
             });
             $match = reset($matches);

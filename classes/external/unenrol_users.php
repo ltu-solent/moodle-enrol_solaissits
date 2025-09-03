@@ -87,7 +87,7 @@ class unenrol_users extends external_api {
             require_capability('enrol/solaissits:unenrol', $context);
             $instance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'solaissits']);
             if (!$instance) {
-                throw new moodle_exception('wsnoinstance', 'enrol_solaissits', $enrolment);
+                throw new moodle_exception('wsnoinstance', 'enrol_solaissits', '', ['courseid' => $course->id]);
             }
             $user = \enrol_solaissits\helper::get_user_by_idnumber($enrolment['useridnumber']);
             if (!$user) {

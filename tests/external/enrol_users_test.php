@@ -57,7 +57,9 @@ final class enrol_users_test extends externallib_advanced_testcase {
         $fieldgenerator = $this->setup_customfields();
         // Course 2 has had a template applied, and is a module pagetype.
         // This is the minimum required for enrolments to happen using this method.
-        $this->set_customfields($course2->id, [
+        $this->set_customfields(
+            $course2->id,
+            [
                 'templateapplied' => 1,
                 'pagetype' => 'module',
             ],

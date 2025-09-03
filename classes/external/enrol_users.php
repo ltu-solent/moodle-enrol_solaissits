@@ -49,15 +49,22 @@ class enrol_users extends external_api {
                         'courseidnumber' => new external_value(PARAM_RAW, 'The course to enrol the user role in'),
                         'groups' => new external_multiple_structure(
                             new external_single_structure([
-                                'name' => new external_value(PARAM_ALPHANUMEXT,
-                                    'Group name. Group is created if it doesn\'t exist'),
+                                'name' => new external_value(
+                                    PARAM_ALPHANUMEXT,
+                                    'Group name. Group is created if it doesn\'t exist'
+                                ),
                                 'action' => new external_value(PARAM_ALPHA, 'add or del', VALUE_OPTIONAL, 'add'),
-                            ]), 'Manage this user\'s group membership', VALUE_OPTIONAL
+                            ]),
+                            'Manage this user\'s group membership',
+                            VALUE_OPTIONAL
                         ),
                         'timestart' => new external_value(PARAM_INT, 'Timestamp when the enrolment start', VALUE_OPTIONAL),
                         'timeend' => new external_value(PARAM_INT, 'Timestamp when the enrolment end', VALUE_OPTIONAL),
                         'suspend' => new external_value(
-                            PARAM_INT, 'set to 1 to suspend & 0 to unsuspend the enrolment', VALUE_OPTIONAL),
+                            PARAM_INT,
+                            'set to 1 to suspend & 0 to unsuspend the enrolment',
+                            VALUE_OPTIONAL
+                        ),
                     ])
                 ),
             ]
@@ -77,8 +84,7 @@ class enrol_users extends external_api {
 
         require_once($CFG->libdir . '/enrollib.php');
 
-        $params = self::validate_parameters(self::execute_parameters(),
-                ['enrolments' => $enrolments]);
+        $params = self::validate_parameters(self::execute_parameters(), ['enrolments' => $enrolments]);
 
         $transaction = $DB->start_delegated_transaction(); // Rollback all enrolment if an error occurs
                                                            // (except if the DB doesn't support it).

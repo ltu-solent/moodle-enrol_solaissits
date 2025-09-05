@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\output\html_writer;
+
 require_once('../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 $params = [
@@ -34,7 +36,8 @@ $params = [
     'treset' => optional_param('treset', null, PARAM_BOOL),
     'tshow' => optional_param('tshow', null, PARAM_ALPHANUMEXT),
     'tsort' => optional_param('tsort', null, PARAM_ALPHANUMEXT),
-
+    'userid' => optional_param('userid', 0, PARAM_INT),
+    'courseid' => optional_param('courseid', 0, PARAM_INT),
 ];
 $pageurl = new moodle_url('/enrol/solaissits/queueditems.php', $params);
 admin_externalpage_setup('enrol_solaissits_queueditems');
@@ -45,7 +48,23 @@ $download = optional_param('download', '', PARAM_ALPHA);
 $PAGE->set_title(get_string('queueditemsheading', 'enrol_solaissits'));
 $PAGE->set_heading(get_string('queueditemsheading', 'enrol_solaissits'));
 
-$table = new \enrol_solaissits\tables\queued_items('solaissitsqueueditems');
+$filterform = new enrol_solaissits\forms\filter(null);
+$userid = 0;
+$courseid = 0;
+$filterreset = optional_param('filterreset', 0, PARAM_BOOL);
+if ($filterdata = $filterform->get_data()) {
+    if (empty($filterreset)) {
+        $userid = $filterdata->userid;
+        $courseid = $filterdata->courseid;
+        $params = [
+            'userid' => $userid,
+            'courseid' => $courseid,
+        ];
+    }
+    $filterform->set_data($params);
+}
+
+$table = new \enrol_solaissits\tables\queued_items('solaissitsqueueditems', $params);
 
 $table->is_downloading($download, 'solaissitsqueueditems', get_string('queueditems', 'enrol_solaissits'));
 
@@ -55,6 +74,8 @@ if (!$table->is_downloading()) {
     echo $OUTPUT->header();
 }
 
+echo html_writer::tag('h3', get_string('filterqueuedenrolments', 'enrol_solaissits'));
+$filterform->display();
 $table->out(100, true);
 
 if (!$table->is_downloading()) {

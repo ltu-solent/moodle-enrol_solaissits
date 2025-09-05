@@ -40,6 +40,8 @@ $string['deleteselectedusers'] = 'Delete selected user enrolments';
 $string['editselectedusers'] = 'Edit selected user enrolments';
 $string['enrolsync'] = 'SITS enrolment sync task';
 
+$string['filterqueuedenrolments'] = 'Filter queued enrolments';
+
 $string['id'] = 'ID';
 $string['invalidtimestartendvalues'] = 'Invalid timestart ({$a->timestart}) and timeend ({$a->timeend}) values';
 
@@ -64,6 +66,8 @@ $string['roleactions_desc'] = 'Depending on the role and page type, a request to
 $string['roledoesntexist'] = 'Role doesn\'t exist: {$a}';
 $string['roleidnotset'] = 'Roleid not set';
 
+$string['selectcourse'] = 'Select course';
+$string['selectuser'] = 'Select user';
 $string['settings'] = 'Settings';
 $string['solaissits:config'] = 'Configure enrolment on payment enrol instances';
 $string['solaissits:enrol'] = 'Enrol users on course';

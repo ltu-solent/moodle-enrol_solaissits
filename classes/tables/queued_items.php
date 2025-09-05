@@ -40,12 +40,20 @@ use table_sql;
  */
 class queued_items extends table_sql {
     /**
+     * Form data from filter form
+     *
+     * @var array
+     */
+    private array $filters;
+    /**
      * Constructor
      *
      * @param string $uniqid Used to store table sorting preferences
+     * @param array $filters Includes search for users
      */
-    public function __construct($uniqid) {
+    public function __construct($uniqid, array $filters) {
         parent::__construct($uniqid);
+        $this->filters = $filters;
         $this->useridfield = 'userid';
         // Set up columns and headings.
         $columns = [
@@ -93,7 +101,20 @@ class queued_items extends table_sql {
         JOIN {user} u ON u.id = s.userid
         LEFT JOIN {course} c ON c.id = s.courseid";
         $where = '1=1';
-        $this->set_sql($fields, $from, $where);
+        $params = [];
+        $wheres = [];
+        if (isset($this->filters['userid']) && $this->filters['userid'] > 0) {
+            $params['userid'] = $this->filters['userid'];
+            $wheres[] = "u.id = :userid";
+        }
+        if (isset($this->filters['courseid']) && $this->filters['courseid'] > 0) {
+            $params['courseid'] = $this->filters['courseid'];
+            $wheres[] = "c.id = :courseid";
+        }
+        if (count($wheres) > 0) {
+            $where = join(' AND ', $wheres);
+        }
+        $this->set_sql($fields, $from, $where, $params);
         $this->showdownloadbuttonsat = [TABLE_P_BOTTOM];
     }
 
